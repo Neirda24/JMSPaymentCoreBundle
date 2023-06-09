@@ -2,6 +2,10 @@
 
 namespace JMS\Payment\CoreBundle\Cryptography;
 
+use RuntimeException;
+use InvalidArgumentException;
+use function function_exists;
+
 /*
  * Copyright 2010 Johannes M. Schmitt <schmittjoh@gmail.com>
  *
@@ -17,7 +21,6 @@ namespace JMS\Payment\CoreBundle\Cryptography;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
  * This implementation transmits the initialization vector (IV) alongside
  * the encrypted data. Choose your cipher/mode combination with care as
@@ -42,25 +45,25 @@ class MCryptEncryptionService implements EncryptionServiceInterface
      */
     public function __construct($secret, $cipher = 'rijndael-256', $mode = 'ctr')
     {
-        if (!extension_loaded('mcrypt')) {
-            throw new \RuntimeException('The mcrypt extension must be loaded.');
+        if (!function_exists('mcrypt_list_algorithms')) {
+            throw new RuntimeException('The mcrypt extension must be loaded.');
         }
 
         @trigger_error('mcrypt has been deprecated in PHP 7.1 and is removed in PHP 7.2. Refer to http://jmspaymentcorebundle.readthedocs.io/en/stable/guides/mcrypt.html for instructions on how to migrate away from mcrypt', E_USER_DEPRECATED);
 
         if (!in_array($cipher, @mcrypt_list_algorithms(), true)) {
-            throw new \InvalidArgumentException(sprintf('The cipher "%s" is not supported.', $cipher));
+            throw new InvalidArgumentException(sprintf('The cipher "%s" is not supported.', $cipher));
         }
 
         if (!in_array($mode, @mcrypt_list_modes(), true)) {
-            throw new \InvalidArgumentException(sprintf('The mode "%s" is not supported.', $mode));
+            throw new InvalidArgumentException(sprintf('The mode "%s" is not supported.', $mode));
         }
 
         $this->cipher = $cipher;
         $this->mode = $mode;
 
         if (0 === strlen($secret)) {
-            throw new \InvalidArgumentException('$secret must not be empty.');
+            throw new InvalidArgumentException('$secret must not be empty.');
         }
 
         $key = hash('sha256', $secret, true);
@@ -73,19 +76,19 @@ class MCryptEncryptionService implements EncryptionServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function decrypt($encryptedValue)
+    public function decrypt(string $encryptedValue): string
     {
         $size = mcrypt_get_iv_size($this->cipher, $this->mode);
         $encryptedValue = base64_decode($encryptedValue);
         $iv = substr($encryptedValue, 0, $size);
 
-        return rtrim(mcrypt_decrypt($this->cipher, $this->key, substr($encryptedValue, $size), $this->mode, $iv));
+        return rtrim((string) mcrypt_decrypt($this->cipher, $this->key, substr($encryptedValue, $size), $this->mode, $iv));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encrypt($rawValue)
+    public function encrypt(string $rawValue): string
     {
         $size = mcrypt_get_iv_size($this->cipher, $this->mode);
         $iv = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);

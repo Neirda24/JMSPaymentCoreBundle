@@ -2,41 +2,35 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Functional\TestBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use JMS\Payment\CoreBundle\Form\ChoosePaymentMethodType;
 use JMS\Payment\CoreBundle\Tests\Functional\TestBundle\Entity\Order;
 use JMS\Payment\CoreBundle\Util\Legacy;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Response;
 
-class LegacyOrderController extends Controller
+class LegacyOrderController extends AbstractController
 {
-    public function paymentDetailsAction($orderId)
+    public function paymentDetailsAction($orderId, Request $request)
     {
         $order = $this->getDoctrine()->getManager()->getRepository(Order::class)->find($orderId);
 
         $formType = Legacy::supportsFormTypeClass()
-            ? 'JMS\Payment\CoreBundle\Form\ChoosePaymentMethodType'
+            ? ChoosePaymentMethodType::class
             : 'jms_choose_payment_method'
         ;
 
         /** @var FormFactory $formFactory */
         $formFactory = $this->get('form.factory');
 
-        $form = $formFactory->create($formType, null, array(
-            'currency' => 'EUR',
-            'amount' => $order->getAmount(),
-            'predefined_data' => array(
-                'test_plugin' => array(
-                    'foo' => 'bar',
-                ),
-            ),
-        ));
+        $form = $formFactory->create($formType, null, ['currency' => 'EUR', 'amount' => $order->getAmount(), 'predefined_data' => ['test_plugin' => ['foo' => 'bar']]]);
 
         $em = $this->getDoctrine()->getManager();
         $ppc = $this->get('payment.plugin_controller');
 
         $request = Legacy::supportsRequestService()
-            ? $this->getRequest()
+            ? $request
             : $this->get('request_stack')->getCurrentRequest()
         ;
 
@@ -53,7 +47,7 @@ class LegacyOrderController extends Controller
             return new Response('', 201);
         }
 
-        return $this->render('TestBundle:Order:paymentDetails.html.twig', [
+        return $this->render('@TestBundle/Order/paymentDetails.html.twig', [
             'form' => $form->createView()
         ]);
     }

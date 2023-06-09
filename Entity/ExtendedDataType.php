@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Entity;
 
+use InvalidArgumentException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\ObjectType;
@@ -26,9 +27,9 @@ use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 
 class ExtendedDataType extends ObjectType
 {
-    const NAME = 'extended_payment_data';
+    final public const NAME = 'extended_payment_data';
 
-    private static $encryptionService;
+    private static ?EncryptionServiceInterface $encryptionService = null;
 
     public static function setEncryptionService(EncryptionServiceInterface $service)
     {
@@ -47,12 +48,12 @@ class ExtendedDataType extends ObjectType
         }
 
         if (!$extendedData instanceof ExtendedDataInterface) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 '$extendedData must implement JMS\Payment\CoreBundle\Model\ExtendedDataInterface'
             );
         }
 
-        $data = array();
+        $data = [];
 
         foreach (array_keys($extendedData->all()) as $name) {
             if (!$extendedData->mayBePersisted($name)) {
@@ -66,11 +67,7 @@ class ExtendedDataType extends ObjectType
                 $value = self::$encryptionService->encrypt(serialize($value));
             }
 
-            $data[$name] = array(
-                $value,
-                $isEncryptionRequired,
-                $mayBePersisted = true,
-            );
+            $data[$name] = [$value, $isEncryptionRequired, $mayBePersisted = true];
         }
 
         return parent::convertToDatabaseValue($data, $platform);

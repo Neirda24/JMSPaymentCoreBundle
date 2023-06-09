@@ -2,19 +2,21 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Entity;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use JMS\Payment\CoreBundle\Cryptography\DefusePhpEncryptionService;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\ExtendedDataType;
+use PHPUnit\Framework\TestCase;
 
-class ExtendedDataTypeTest extends \PHPUnit_Framework_TestCase
+class ExtendedDataTypeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (Type::hasType(ExtendedDataType::NAME)) {
-            Type::overrideType(ExtendedDataType::NAME, 'JMS\Payment\CoreBundle\Entity\ExtendedDataType');
+            Type::overrideType(ExtendedDataType::NAME, ExtendedDataType::class);
         } else {
-            Type::addType(ExtendedDataType::NAME, 'JMS\Payment\CoreBundle\Entity\ExtendedDataType');
+            Type::addType(ExtendedDataType::NAME, ExtendedDataType::class);
         }
     }
 
@@ -49,7 +51,7 @@ class ExtendedDataTypeTest extends \PHPUnit_Framework_TestCase
 
         $serialized = $type->convertToDatabaseValue($extendedData, $this->getPlatform());
         $this->assertTrue(false !== $unserialized = unserialize($serialized));
-        $this->assertInternalType('array', $unserialized);
+        $this->assertIsArray($unserialized);
         $this->assertEquals('secret', $extendedData->get('foo2'), 'ExtendedData object is not affected by encryption.');
         $this->assertEquals('foo', $extendedData->get('foo'), 'ExtendedData object is not affected by conversion.');
         $this->assertEquals('foo', $unserialized['foo'][0]);
@@ -65,6 +67,6 @@ class ExtendedDataTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function getPlatform()
     {
-        return $this->getMockForAbstractClass('Doctrine\DBAL\Platforms\AbstractPlatform');
+        return $this->getMockForAbstractClass(AbstractPlatform::class);
     }
 }

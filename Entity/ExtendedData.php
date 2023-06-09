@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Entity;
 
+use InvalidArgumentException;
 use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 
 /*
@@ -22,12 +23,12 @@ use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 
 class ExtendedData implements ExtendedDataInterface
 {
-    private $data;
+    private array $data;
     private $listeners;
 
     public function __construct()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
     public function remove($name)
@@ -38,7 +39,7 @@ class ExtendedData implements ExtendedDataInterface
     public function isEncryptionRequired($name)
     {
         if (!isset($this->data[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no data with key "%s".', $name));
+            throw new InvalidArgumentException(sprintf('There is no data with key "%s".', $name));
         }
 
         return $this->data[$name][1];
@@ -47,7 +48,7 @@ class ExtendedData implements ExtendedDataInterface
     public function mayBePersisted($name)
     {
         if (!isset($this->data[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no data with key "%s".', $name));
+            throw new InvalidArgumentException(sprintf('There is no data with key "%s".', $name));
         }
 
         return $this->data[$name][2];
@@ -56,16 +57,16 @@ class ExtendedData implements ExtendedDataInterface
     public function set($name, $value, $encrypt = true, $persist = true)
     {
         if ($encrypt && !$persist) {
-            throw new \InvalidArgumentException(sprintf('Non persisted field cannot be encrypted "%s".', $name));
+            throw new InvalidArgumentException(sprintf('Non persisted field cannot be encrypted "%s".', $name));
         }
 
-        $this->data[$name] = array($value, $encrypt, $persist);
+        $this->data[$name] = [$value, $encrypt, $persist];
     }
 
     public function get($name)
     {
         if (!isset($this->data[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no data with key "%s".', $name));
+            throw new InvalidArgumentException(sprintf('There is no data with key "%s".', $name));
         }
 
         return $this->data[$name][0];

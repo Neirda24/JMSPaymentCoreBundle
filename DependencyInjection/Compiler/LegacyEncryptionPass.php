@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\DependencyInjection\Compiler;
 
+use JMS\Payment\CoreBundle\Cryptography\MCryptEncryptionService;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -24,12 +25,7 @@ class LegacyEncryptionPass implements CompilerPassInterface
             return;
         }
 
-        $parameters = array(
-            'class'  => 'JMS\Payment\CoreBundle\Cryptography\MCryptEncryptionService',
-            'secret' => '',
-            'cipher' => 'rijndael-256',
-            'mode'   => 'ctr',
-        );
+        $parameters = ['class'  => MCryptEncryptionService::class, 'secret' => '', 'cipher' => 'rijndael-256', 'mode'   => 'ctr'];
 
         foreach ($parameters as $parameter => $defaultValue) {
             if (!$container->hasParameter('payment.encryption_service.'.$parameter)) {

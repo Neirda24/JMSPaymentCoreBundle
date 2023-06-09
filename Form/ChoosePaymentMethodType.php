@@ -2,6 +2,9 @@
 
 namespace JMS\Payment\CoreBundle\Form;
 
+use InvalidArgumentException;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use RuntimeException;
 use JMS\Payment\CoreBundle\Form\Transformer\ChoosePaymentMethodTransformer;
 use JMS\Payment\CoreBundle\PluginController\PluginControllerInterface;
 use JMS\Payment\CoreBundle\PluginController\Result;
@@ -14,7 +17,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Form Type for Choosing a Payment Method.
@@ -23,17 +25,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class ChoosePaymentMethodType extends AbstractType
 {
-    private $pluginController;
     private $paymentMethods;
-    private $transformer;
+    private ?DataTransformerInterface $transformer = null;
 
-    public function __construct(PluginControllerInterface $pluginController, array $paymentMethods)
+    public function __construct(private PluginControllerInterface $pluginController, array $paymentMethods)
     {
         if (!$paymentMethods) {
-            throw new \InvalidArgumentException('There is no payment method available. Did you forget to register concrete payment provider bundles such as JMSPaymentPaypalBundle?');
+            throw new InvalidArgumentException('There is no payment method available. Did you forget to register concrete payment provider bundles such as JMSPaymentPaypalBundle?');
         }
-
-        $this->pluginController = $pluginController;
         $this->paymentMethods = $paymentMethods;
     }
 
@@ -49,7 +48,7 @@ class ChoosePaymentMethodType extends AbstractType
         $this->buildChoiceList($builder, $options);
 
         foreach ($options['available_methods'] as $method => $class) {
-            $methodOptions = isset($options['method_options'][$method]) ? $options['method_options'][$method] : array();
+            $methodOptions = $options['method_options'][$method] ?? [];
             $builder->add('data_'.$method, $class, $methodOptions);
         }
 
@@ -60,9 +59,7 @@ class ChoosePaymentMethodType extends AbstractType
 
         // To maintain BC, we instantiate a new ChoosePaymentMethodTransformer in
         // case it hasn't been supplied.
-        $transformer = $this->transformer
-            ? $this->transformer
-            : new ChoosePaymentMethodTransformer()
+        $transformer = $this->transformer ?: new ChoosePaymentMethodTransformer()
         ;
 
         $transformer->setOptions($options);
@@ -74,20 +71,14 @@ class ChoosePaymentMethodType extends AbstractType
         $methods = $options['available_methods'];
         $choiceOptions = $options['choice_options'];
 
-        $options = array_merge(array(
-            'expanded' => true,
-            'data' => $options['default_method'],
-        ), $options);
+        $options = array_merge(['expanded' => true, 'data' => $options['default_method']], $options);
 
         // Remove unwanted options
-        $options = array_intersect_key($options, array_flip(array(
-            'expanded',
-            'data',
-        )));
+        $options = array_intersect_key($options, array_flip(['expanded', 'data']));
 
         $options = array_merge($options, $choiceOptions);
 
-        $options['choices'] = array();
+        $options['choices'] = [];
         foreach (array_keys($methods) as $method) {
             $label = 'form.label.'.$method;
 
@@ -102,7 +93,7 @@ class ChoosePaymentMethodType extends AbstractType
         }
 
         $type = Legacy::supportsFormTypeClass()
-            ? 'Symfony\Component\Form\Extension\Core\Type\ChoiceType'
+            ? ChoiceType::class
             : 'choice'
         ;
 
@@ -141,28 +132,11 @@ class ChoosePaymentMethodType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(array(
-            'amount',
-            'currency',
-        ));
+        $resolver->setRequired(['amount', 'currency']);
 
-        $resolver->setDefaults(array(
-            'predefined_data' => array(),
-            'allowed_methods' => array(),
-            'default_method'  => null,
-            'method_options'  => array(),
-            'choice_options'  => array(),
-        ));
+        $resolver->setDefaults(['predefined_data' => [], 'allowed_methods' => [], 'default_method'  => null, 'method_options'  => [], 'choice_options'  => []]);
 
-        $allowedTypes = array(
-            'amount'          => array('numeric', 'closure'),
-            'currency'        => 'string',
-            'predefined_data' => 'array',
-            'allowed_methods' => 'array',
-            'default_method'  => array('null', 'string'),
-            'method_options'  => 'array',
-            'choice_options'  => 'array',
-        );
+        $allowedTypes = ['amount'          => ['numeric', 'closure'], 'currency'        => 'string', 'predefined_data' => 'array', 'allowed_methods' => 'array', 'default_method'  => ['null', 'string'], 'method_options'  => 'array', 'choice_options'  => 'array'];
 
         if (Legacy::supportsOptionsResolverSetAllowedTypesAsArray()) {
             $resolver->setAllowedTypes($allowedTypes);
@@ -181,7 +155,7 @@ class ChoosePaymentMethodType extends AbstractType
     /**
      * Legacy support for Symfony < 3.0.
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $this->configureOptions($resolver);
     }
@@ -213,7 +187,7 @@ class ChoosePaymentMethodType extends AbstractType
         }
 
         foreach ($dataErrors as $path => $error) {
-            $path = explode('.', $path);
+            $path = explode('.', (string) $path);
             $field = $form;
             do {
                 $field = $field->get(array_shift($path));
@@ -226,7 +200,7 @@ class ChoosePaymentMethodType extends AbstractType
     private function getPaymentMethods($allowedMethods)
     {
         $allowAllMethods = empty($allowedMethods);
-        $availableMethods = array();
+        $availableMethods = [];
 
         foreach ($this->paymentMethods as $methodKey => $methodClass) {
             if (!$allowAllMethods && !in_array($methodKey, $allowedMethods, true)) {
@@ -237,7 +211,7 @@ class ChoosePaymentMethodType extends AbstractType
         }
 
         if (empty($availableMethods)) {
-            throw new \RuntimeException(sprintf(
+            throw new RuntimeException(sprintf(
                 'You have not selected any payment methods. Available methods: "%s"',
                 implode(', ', $this->paymentMethods)
             ));

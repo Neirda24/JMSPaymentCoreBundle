@@ -2,6 +2,11 @@
 
 namespace JMS\Payment\CoreBundle\Util;
 
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -19,7 +24,7 @@ class Legacy
     public static function supportsFormTypeClass()
     {
         return method_exists(
-            'Symfony\Component\Form\AbstractType',
+            AbstractType::class,
             'getBlockPrefix'
         );
     }
@@ -32,7 +37,7 @@ class Legacy
     public static function supportsOptionsResolverSetAllowedTypesAsArray()
     {
         return !method_exists(
-            'Symfony\Component\OptionsResolver\OptionsResolver',
+            OptionsResolver::class,
             'setDefined'
         );
     }
@@ -51,7 +56,7 @@ class Legacy
     public static function formChoicesAsValues()
     {
         return method_exists(
-            'Symfony\Component\Form\AbstractType',
+            AbstractType::class,
             'configureOptions'
         );
     }
@@ -63,7 +68,7 @@ class Legacy
     public static function needsChoicesAsValuesOption()
     {
         return self::formChoicesAsValues() && method_exists(
-            'Symfony\Component\Form\FormTypeInterface',
+            FormTypeInterface::class,
             'setDefaultOptions'
         );
     }
@@ -83,7 +88,7 @@ class Legacy
      */
     public static function isOldPathExecutionContext()
     {
-        return !class_exists('Symfony\Component\Validator\Context\ExecutionContext');
+        return !class_exists(ExecutionContext::class);
     }
 
     /**
@@ -92,6 +97,6 @@ class Legacy
      */
     public static function supportsRequestService()
     {
-        return !class_exists('Symfony\Component\HttpFoundation\RequestStack');
+        return !class_exists(RequestStack::class);
     }
 }

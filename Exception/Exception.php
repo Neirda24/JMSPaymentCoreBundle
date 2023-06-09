@@ -25,7 +25,7 @@ namespace JMS\Payment\CoreBundle\Exception;
  */
 class Exception extends \Exception
 {
-    protected $properties = array();
+    protected $properties = [];
 
     public function addProperty($name, $value)
     {

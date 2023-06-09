@@ -9,16 +9,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateKeyCommand extends Command
 {
-    protected function configure()
-    {
-        $this
-            ->setName('jms_payment_core:generate-key')
-            ->setDescription('Generate an encryption key')
-        ;
-    }
+    protected static $defaultName = 'jms_payment_core:generate-key';
+    protected static $defaultDescription = 'Generate an encryption key';
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(Key::createNewRandomKey()->saveToAsciiSafeString());
+
+        return Command::SUCCESS;
     }
 }

@@ -2,6 +2,9 @@
 
 namespace JMS\Payment\CoreBundle\Entity;
 
+use DateTime;
+use Doctrine\Common\Collections\Collection;
+use InvalidArgumentException;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 
@@ -24,66 +27,51 @@ use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 class PaymentInstruction implements PaymentInstructionInterface
 {
     private $account;
-    private $amount;
     private $approvedAmount;
     private $approvingAmount;
-    private $createdAt;
+    private DateTime $createdAt;
     private $creditedAmount;
     private $creditingAmount;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection|\JMS\Payment\CoreBundle\Entity\Credit[]
+     * @var Collection<Credit>
      */
-    private $credits;
-
-    private $currency;
+    private Collection $credits;
     private $depositedAmount;
     private $depositingAmount;
 
-    /**
-     * @var \JMS\Payment\CoreBundle\Entity\ExtendedData
-     */
-    private $extendedData;
+    private ExtendedData $extendedData;
 
-    /**
-     * @var \JMS\Payment\CoreBundle\Entity\ExtendedData
-     */
-    private $extendedDataOriginal;
+    private ExtendedData $extendedDataOriginal;
 
     private $id;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection|\JMS\Payment\CoreBundle\Entity\Payment[]
+     * @var Collection<Payment>
      */
-    private $payments;
-
-    private $paymentSystemName;
+    private Collection $payments;
     private $reversingApprovedAmount;
     private $reversingCreditedAmount;
     private $reversingDepositedAmount;
     private $state;
-    private $updatedAt;
+    private ?Datetime $updatedAt = null;
 
-    public function __construct($amount, $currency, $paymentSystemName, ExtendedData $data = null)
+    public function __construct(private $amount, private $currency, private $paymentSystemName, ExtendedData $data = null)
     {
         if (null === $data) {
             $data = new ExtendedData();
         }
-
-        $this->amount = $amount;
         $this->approvedAmount = 0.0;
         $this->approvingAmount = 0.0;
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTime();
         $this->creditedAmount = 0.0;
         $this->creditingAmount = 0.0;
         $this->credits = new ArrayCollection();
-        $this->currency = $currency;
         $this->depositingAmount = 0.0;
         $this->depositedAmount = 0.0;
         $this->extendedData = $data;
         $this->extendedDataOriginal = clone $data;
         $this->payments = new ArrayCollection();
-        $this->paymentSystemName = $paymentSystemName;
         $this->reversingApprovedAmount = 0.0;
         $this->reversingCreditedAmount = 0.0;
         $this->reversingDepositedAmount = 0.0;
@@ -100,7 +88,7 @@ class PaymentInstruction implements PaymentInstructionInterface
     public function addCredit(Credit $credit)
     {
         if ($credit->getPaymentInstruction() !== $this) {
-            throw new \InvalidArgumentException('This credit container belongs to another instruction.');
+            throw new InvalidArgumentException('This credit container belongs to another instruction.');
         }
 
         $this->credits->add($credit);
@@ -116,7 +104,7 @@ class PaymentInstruction implements PaymentInstructionInterface
     public function addPayment(Payment $payment)
     {
         if ($payment->getPaymentInstruction() !== $this) {
-            throw new \InvalidArgumentException('This payment container belongs to another instruction.');
+            throw new InvalidArgumentException('This payment container belongs to another instruction.');
         }
 
         $this->payments->add($payment);
@@ -138,7 +126,7 @@ class PaymentInstruction implements PaymentInstructionInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\ExtendedData
+     * @return ExtendedData
      */
     public function getExtendedData()
     {
@@ -186,7 +174,7 @@ class PaymentInstruction implements PaymentInstructionInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection|\JMS\Payment\CoreBundle\Entity\Credit[]
+     * @return Collection<Credit>
      */
     public function getCredits()
     {
@@ -194,7 +182,7 @@ class PaymentInstruction implements PaymentInstructionInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection|\JMS\Payment\CoreBundle\Entity\Payment[]
+     * @return Collection<Payment>
      */
     public function getPayments()
     {
@@ -202,7 +190,7 @@ class PaymentInstruction implements PaymentInstructionInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\FinancialTransaction|null
+     * @return FinancialTransaction|null
      */
     public function getPendingTransaction()
     {
@@ -258,7 +246,7 @@ class PaymentInstruction implements PaymentInstructionInterface
 
     public function onPreSave()
     {
-        $this->updatedAt = new \Datetime();
+        $this->updatedAt = new Datetime();
 
         // this is necessary until Doctrine adds an interface for comparing
         // value objects. Right now this is done by referential equality

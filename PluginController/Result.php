@@ -2,6 +2,10 @@
 
 namespace JMS\Payment\CoreBundle\PluginController;
 
+use JMS\Payment\CoreBundle\Model\CreditInterface;
+use JMS\Payment\CoreBundle\Model\PaymentInterface;
+use InvalidArgumentException;
+use LogicException;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 use JMS\Payment\CoreBundle\Plugin\Exception\Exception as PluginException;
@@ -24,28 +28,28 @@ use JMS\Payment\CoreBundle\Plugin\Exception\Exception as PluginException;
 
 class Result
 {
-    const STATUS_FAILED = 1;
-    const STATUS_PENDING = 2;
-    const STATUS_SUCCESS = 3;
-    const STATUS_UNKNOWN = 4;
+    final public const STATUS_FAILED = 1;
+    final public const STATUS_PENDING = 2;
+    final public const STATUS_SUCCESS = 3;
+    final public const STATUS_UNKNOWN = 4;
 
     /**
-     * @var \JMS\Payment\CoreBundle\Model\CreditInterface|null
+     * @var CreditInterface|null
      */
     protected $credit;
 
     /**
-     * @var \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface|null
+     * @var FinancialTransactionInterface|null
      */
     protected $financialTransaction;
 
     /**
-     * @var \JMS\Payment\CoreBundle\Model\PaymentInterface|null
+     * @var PaymentInterface|null
      */
     protected $payment;
 
     /**
-     * @var \JMS\Payment\CoreBundle\Model\PaymentInstructionInterface
+     * @var PaymentInstructionInterface
      */
     protected $paymentInstruction;
 
@@ -65,7 +69,7 @@ class Result
         } elseif (3 === $nbArgs && $args[0] instanceof PaymentInstructionInterface) {
             $this->constructPaymentInstructionResult($args[0], $args[1], $args[2]);
         } else {
-            throw new \InvalidArgumentException('The given arguments are not supported.');
+            throw new InvalidArgumentException('The given arguments are not supported.');
         }
     }
 
@@ -75,7 +79,7 @@ class Result
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface|null
+     * @return FinancialTransactionInterface|null
      */
     public function getFinancialTransaction()
     {
@@ -93,7 +97,7 @@ class Result
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\CreditInterface|null
+     * @return CreditInterface|null
      */
     public function getCredit()
     {
@@ -101,7 +105,7 @@ class Result
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInterface|null
+     * @return PaymentInterface|null
      */
     public function getPayment()
     {
@@ -109,7 +113,7 @@ class Result
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInstructionInterface
+     * @return PaymentInstructionInterface
      */
     public function getPaymentInstruction()
     {
@@ -119,7 +123,7 @@ class Result
     public function isAttentionRequired()
     {
         if (null === $this->payment && null === $this->credit) {
-            throw new \LogicException('The result contains neither a payment, nor a credit.');
+            throw new LogicException('The result contains neither a payment, nor a credit.');
         }
 
         return null !== $this->payment ? $this->payment->isAttentionRequired() : $this->credit->isAttentionRequired();

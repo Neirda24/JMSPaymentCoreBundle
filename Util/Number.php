@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Util;
 
+use InvalidArgumentException;
 /*
  * Copyright 2010 Johannes M. Schmitt <schmittjoh@gmail.com>
  *
@@ -17,10 +18,9 @@ namespace JMS\Payment\CoreBundle\Util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 class Number
 {
-    const EPSILON = 1.0E-8;
+    final public const EPSILON = 1.0E-8;
 
     public static function compare($float1, $float2, $comparison = null)
     {
@@ -35,7 +35,7 @@ class Number
                 return false;
             }
 
-            throw new \InvalidArgumentException(sprintf('Invalid comparison "%s".', $comparison));
+            throw new InvalidArgumentException(sprintf('Invalid comparison "%s".', $comparison));
         }
 
         if (null === $comparison) {
@@ -51,7 +51,7 @@ class Number
             return $float1 < $float2;
         }
 
-        throw new \InvalidArgumentException(sprintf('Invalid comparison "%s".', $comparison));
+        throw new InvalidArgumentException(sprintf('Invalid comparison "%s".', $comparison));
     }
 
     final private function __construct()

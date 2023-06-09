@@ -2,12 +2,15 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
+use Doctrine\Common\Collections\ArrayCollection;
+use DateTime;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\FinancialTransaction;
 use JMS\Payment\CoreBundle\Entity\Payment;
 use JMS\Payment\CoreBundle\Entity\PaymentInstruction;
 
-class PaymentTest extends \PHPUnit_Framework_TestCase
+class PaymentTest extends TestCase
 {
     public function testConstructor()
     {
@@ -24,7 +27,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0.0, $payment->getReversingDepositedAmount());
         $this->assertEquals(Payment::STATE_NEW, $payment->getState());
         $this->assertEquals(123.45, $payment->getTargetAmount());
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $payment->getTransactions());
+        $this->assertInstanceOf(ArrayCollection::class, $payment->getTransactions());
         $this->assertEquals(0, count($payment->getTransactions()));
         $this->assertFalse($payment->isAttentionRequired());
         $this->assertFalse($payment->isExpired());
@@ -68,10 +71,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
 
     public function getApproveTransactionTypes()
     {
-        return array(
-            array(FinancialTransaction::TRANSACTION_TYPE_APPROVE),
-            array(FinancialTransaction::TRANSACTION_TYPE_APPROVE_AND_DEPOSIT),
-        );
+        return [[FinancialTransaction::TRANSACTION_TYPE_APPROVE], [FinancialTransaction::TRANSACTION_TYPE_APPROVE_AND_DEPOSIT]];
     }
 
     public function testGetDepositTransactions()
@@ -91,7 +91,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $payment = new Payment($this->getInstruction(), 123);
 
         $this->assertNull($payment->getExpirationDate());
-        $payment->setExpirationDate($date = new \DateTime());
+        $payment->setExpirationDate($date = new DateTime());
         $this->assertSame($date, $payment->getExpirationDate());
     }
 
@@ -198,10 +198,10 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $payment = new Payment($this->getInstruction(), 123);
 
         $this->assertFalse($payment->isExpired());
-        $payment->setExpirationDate(new \DateTime('yesterday'));
+        $payment->setExpirationDate(new DateTime('yesterday'));
         $this->assertTrue($payment->isExpired());
 
-        $payment->setExpirationDate(new \DateTime('tomorrow'));
+        $payment->setExpirationDate(new DateTime('tomorrow'));
         $this->assertFalse($payment->isExpired());
     }
 
@@ -234,26 +234,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
 
     public function getSetterGetterTestData()
     {
-        return array(
-            array('ApprovingAmount', 123.45, 0.0),
-            array('ApprovingAmount', 583, 0.0),
-            array('ApprovedAmount', 123.45, 0.0),
-            array('ApprovedAmount', 583, 0.0),
-            array('CreditedAmount', 123.45, 0.0),
-            array('CreditedAmount', 533, 0.0),
-            array('CreditingAmount', 452.64, 0.0),
-            array('CreditingAmount', 567, 0.0),
-            array('DepositedAmount', 123.45, 0.0),
-            array('DepositedAmount', 583, 0.0),
-            array('DepositingAmount', 123.45, 0.0),
-            array('DepositingAmount', 583, 0.0),
-            array('ReversingApprovedAmount', 123.45, 0.0),
-            array('ReversingApprovedAmount', 583, 0.0),
-            array('ReversingCreditedAmount', 252.63, 0.0),
-            array('ReversingCreditedAmount', 5234, 0.0),
-            array('ReversingDepositedAmount', 123.45, 0.0),
-            array('ReversingDepositedAmount', 583, 0.0),
-        );
+        return [['ApprovingAmount', 123.45, 0.0], ['ApprovingAmount', 583, 0.0], ['ApprovedAmount', 123.45, 0.0], ['ApprovedAmount', 583, 0.0], ['CreditedAmount', 123.45, 0.0], ['CreditedAmount', 533, 0.0], ['CreditingAmount', 452.64, 0.0], ['CreditingAmount', 567, 0.0], ['DepositedAmount', 123.45, 0.0], ['DepositedAmount', 583, 0.0], ['DepositingAmount', 123.45, 0.0], ['DepositingAmount', 583, 0.0], ['ReversingApprovedAmount', 123.45, 0.0], ['ReversingApprovedAmount', 583, 0.0], ['ReversingCreditedAmount', 252.63, 0.0], ['ReversingCreditedAmount', 5234, 0.0], ['ReversingDepositedAmount', 123.45, 0.0], ['ReversingDepositedAmount', 583, 0.0]];
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Model;
 
+use DateTime;
 /*
  * Copyright 2010 Johannes M. Schmitt <schmittjoh@gmail.com>
  *
@@ -17,22 +18,21 @@ namespace JMS\Payment\CoreBundle\Model;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 interface PaymentInterface
 {
-    const STATE_APPROVED = 1;
-    const STATE_APPROVING = 2;
-    const STATE_CANCELED = 3;
-    const STATE_EXPIRED = 4;
-    const STATE_FAILED = 5;
-    const STATE_NEW = 6;
-    const STATE_DEPOSITING = 7;
-    const STATE_DEPOSITED = 8;
+    public const STATE_APPROVED = 1;
+    public const STATE_APPROVING = 2;
+    public const STATE_CANCELED = 3;
+    public const STATE_EXPIRED = 4;
+    public const STATE_FAILED = 5;
+    public const STATE_NEW = 6;
+    public const STATE_DEPOSITING = 7;
+    public const STATE_DEPOSITED = 8;
 
     public function getApprovedAmount();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface|null
+     * @return FinancialTransactionInterface|null
      */
     public function getApproveTransaction();
 
@@ -43,7 +43,7 @@ interface PaymentInterface
     public function getDepositingAmount();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface[]
+     * @return FinancialTransactionInterface[]
      */
     public function getDepositTransactions();
 
@@ -51,22 +51,22 @@ interface PaymentInterface
     public function getId();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInstructionInterface
+     * @return PaymentInstructionInterface
      */
     public function getPaymentInstruction();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface|null
+     * @return FinancialTransactionInterface|null
      */
     public function getPendingTransaction();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface[]
+     * @return FinancialTransactionInterface[]
      */
     public function getReverseApprovalTransactions();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface[]
+     * @return FinancialTransactionInterface[]
      */
     public function getReverseDepositTransactions();
 
@@ -85,7 +85,7 @@ interface PaymentInterface
     public function setCreditingAmount($amount);
     public function setDepositedAmount($amount);
     public function setDepositingAmount($amount);
-    public function setExpirationDate(\DateTime $date);
+    public function setExpirationDate(DateTime $date);
     public function setExpired($boolean);
     public function setReversingApprovedAmount($amount);
     public function setReversingCreditedAmount($amount);

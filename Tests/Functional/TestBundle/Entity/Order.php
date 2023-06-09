@@ -17,15 +17,14 @@ class Order
     /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue(strategy="AUTO") */
     private $id;
 
-    /** @ORM\Column(type="decimal", precision = 2) */
-    private $amount;
-
     /** @ORM\OneToOne(targetEntity="JMS\Payment\CoreBundle\Entity\PaymentInstruction") */
-    private $paymentInstruction;
+    private ?PaymentInstruction $paymentInstruction = null;
 
-    public function __construct($amount)
+    public function __construct(
+        /** @ORM\Column(type="decimal", precision = 2) */
+        private $amount
+    )
     {
-        $this->amount = $amount;
     }
 
     public function getId()

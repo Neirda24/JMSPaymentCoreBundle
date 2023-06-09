@@ -2,14 +2,14 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Functional\TestBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use JMS\Payment\CoreBundle\Form\ChoosePaymentMethodType;
 use JMS\Payment\CoreBundle\PluginController\PluginController;
 use JMS\Payment\CoreBundle\Tests\Functional\TestBundle\Entity\Order;
 use JMS\Payment\CoreBundle\Util\Legacy;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/order")
@@ -20,35 +20,25 @@ class OrderController extends AbstractController
 {
     /**
      * @Route("/{orderId}/payment-details", name = "payment_details")
-     * @Template("TestBundle:Order:paymentDetails.html.twig")
      *
      * @param int $orderId
-     * @param PluginController $pluginController
      * @return array|Response
      */
-    public function paymentDetailsAction($orderId, PluginController $pluginController)
+    public function paymentDetailsAction($orderId, PluginController $pluginController, Request $request)
     {
         $order = $this->getDoctrine()->getManager()->getRepository(Order::class)->find($orderId);
 
         $formType = Legacy::supportsFormTypeClass()
-            ? 'JMS\Payment\CoreBundle\Form\ChoosePaymentMethodType'
+            ? ChoosePaymentMethodType::class
             : 'jms_choose_payment_method'
         ;
 
-        $form = $this->get('form.factory')->create($formType, null, array(
-            'currency' => 'EUR',
-            'amount' => $order->getAmount(),
-            'predefined_data' => array(
-                'test_plugin' => array(
-                    'foo' => 'bar',
-                ),
-            ),
-        ));
+        $form = $this->get('form.factory')->create($formType, null, ['currency' => 'EUR', 'amount' => $order->getAmount(), 'predefined_data' => ['test_plugin' => ['foo' => 'bar']]]);
 
         $em = $this->getDoctrine()->getManager();
 
         $request = Legacy::supportsRequestService()
-            ? $this->getRequest()
+            ? $request
             : $this->get('request_stack')->getCurrentRequest()
         ;
 
@@ -65,6 +55,6 @@ class OrderController extends AbstractController
             return new Response('', 201);
         }
 
-        return array('form' => $form->createView());
+        return $this->render('@TestBundle/Order/paymentDetails.html.twig', ['form' => $form->createView()]);
     }
 }

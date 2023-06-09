@@ -30,13 +30,7 @@ class JMSPaymentCoreExtension extends Extension implements PrependExtensionInter
 {
     public function prepend(ContainerBuilder $container)
     {
-        $container->prependExtensionConfig('doctrine', array(
-            'dbal' => array(
-                'types' => array(
-                    ExtendedDataType::NAME => 'JMS\Payment\CoreBundle\Entity\ExtendedDataType',
-                ),
-            ),
-        ));
+        $container->prependExtensionConfig('doctrine', ['dbal' => ['types' => [ExtendedDataType::NAME => ExtendedDataType::class]]]);
     }
 
     public function load(array $configs, ContainerBuilder $container)
@@ -59,7 +53,7 @@ class JMSPaymentCoreExtension extends Extension implements PrependExtensionInter
             $container->setParameter('payment.encryption', $config['encryption']['provider']);
             $container->setParameter('payment.encryption.secret', $config['encryption']['secret']);
 
-            foreach (array('mcrypt', 'defuse_php_encryption') as $provider) {
+            foreach (['mcrypt', 'defuse_php_encryption'] as $provider) {
                 $container->setParameter("payment.encryption.$provider.secret", $config['encryption']['secret']);
             }
         } else {

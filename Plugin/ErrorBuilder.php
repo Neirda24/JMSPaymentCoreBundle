@@ -11,8 +11,8 @@ use JMS\Payment\CoreBundle\Plugin\Exception\InvalidPaymentInstructionException;
  */
 class ErrorBuilder
 {
-    private $dataErrors = array();
-    private $globalErrors = array();
+    private array $dataErrors = [];
+    private array $globalErrors = [];
 
     public function addDataError($field, $messageTemplate)
     {

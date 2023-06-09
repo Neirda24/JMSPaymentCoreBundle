@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Entity;
 
+use DateTime;
 use JMS\Payment\CoreBundle\Model\CreditInterface;
 use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
@@ -26,26 +27,23 @@ use JMS\Payment\CoreBundle\Model\PaymentInterface;
 class FinancialTransaction implements FinancialTransactionInterface
 {
     /**
-     * @var \JMS\Payment\CoreBundle\Entity\Credit|null
+     * @var Credit|null
      */
-    private $credit;
+    private ?CreditInterface $credit = null;
 
     /**
-     * @var \JMS\Payment\CoreBundle\Entity\ExtendedData|null
+     * @var ExtendedData|null
      */
-    private $extendedData;
+    private ExtendedData|ExtendedDataInterface|null $extendedData = null;
 
-    /**
-     * @var \JMS\Payment\CoreBundle\Entity\ExtendedData|null
-     */
-    private $extendedDataOriginal;
+    private ?ExtendedData $extendedDataOriginal = null;
 
     private $id;
 
     /**
-     * @var \JMS\Payment\CoreBundle\Entity\Payment|null
+     * @var Payment|null
      */
-    private $payment;
+    private ?PaymentInterface $payment = null;
 
     private $processedAmount;
     private $reasonCode;
@@ -53,21 +51,21 @@ class FinancialTransaction implements FinancialTransactionInterface
     private $requestedAmount;
     private $responseCode;
     private $state;
-    private $createdAt;
-    private $updatedAt;
+    private DateTime $createdAt;
+    private ?DateTime $updatedAt = null;
     private $trackingId;
     private $transactionType;
 
     public function __construct()
     {
         $this->state = self::STATE_NEW;
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTime();
         $this->processedAmount = 0.0;
         $this->requestedAmount = 0.0;
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\Credit|null
+     * @return Credit|null
      */
     public function getCredit()
     {
@@ -75,7 +73,7 @@ class FinancialTransaction implements FinancialTransactionInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\ExtendedData|null
+     * @return ExtendedData|null
      */
     public function getExtendedData()
     {
@@ -98,7 +96,7 @@ class FinancialTransaction implements FinancialTransactionInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\Payment|null
+     * @return Payment|null
      */
     public function getPayment()
     {
@@ -164,7 +162,7 @@ class FinancialTransaction implements FinancialTransactionInterface
 
     public function onPrePersist()
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = new DateTime();
 
         if (null !== $this->extendedDataOriginal
                  && null !== $this->extendedData

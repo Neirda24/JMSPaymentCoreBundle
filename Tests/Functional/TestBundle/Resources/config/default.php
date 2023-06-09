@@ -6,6 +6,7 @@ $files = [
     'database.php',
     'framework.php',
     'doctrine.yml',
+    'twig.php',
 ];
 
 if (version_compare(Kernel::VERSION, '3.0', '>=')) {

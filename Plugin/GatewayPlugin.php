@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Plugin;
 
+use RuntimeException;
 use JMS\Payment\CoreBundle\BrowserKit\Request;
 use JMS\Payment\CoreBundle\Plugin\Exception\CommunicationException;
 use Symfony\Component\BrowserKit\Response;
@@ -36,7 +37,7 @@ abstract class GatewayPlugin extends AbstractPlugin
     {
         parent::__construct($isDebug);
 
-        $this->curlOptions = array();
+        $this->curlOptions = [];
     }
 
     public function setCurlOption($name, $value)
@@ -47,7 +48,6 @@ abstract class GatewayPlugin extends AbstractPlugin
     /**
      * A small helper to url-encode an array.
      *
-     * @param array $encode
      *
      * @return string
      */
@@ -55,7 +55,7 @@ abstract class GatewayPlugin extends AbstractPlugin
     {
         $encoded = '';
         foreach ($encode as $name => $value) {
-            $encoded .= '&'.urlencode($name).'='.urlencode($value);
+            $encoded .= '&'.urlencode($name).'='.urlencode((string) $value);
         }
 
         return substr($encoded, 1);
@@ -66,14 +66,13 @@ abstract class GatewayPlugin extends AbstractPlugin
      *
      * @throws CommunicationException when an curl error occurs
      *
-     * @param Request $request
      *
      * @return Response
      */
     public function request(Request $request)
     {
         if (!extension_loaded('curl')) {
-            throw new \RuntimeException('The cURL extension must be loaded.');
+            throw new RuntimeException('The cURL extension must be loaded.');
         }
 
         $curl = curl_init();
@@ -85,7 +84,7 @@ abstract class GatewayPlugin extends AbstractPlugin
         curl_setopt($curl, CURLOPT_HEADER, true);
 
         // add headers
-        $headers = array();
+        $headers = [];
         foreach ($request->headers->all() as $name => $value) {
             if (is_array($value)) {
                 foreach ($value as $subValue) {
@@ -100,7 +99,7 @@ abstract class GatewayPlugin extends AbstractPlugin
         }
 
         // set method
-        $method = strtoupper($request->getMethod());
+        $method = strtoupper((string) $request->getMethod());
         if ('POST' === $method) {
             curl_setopt($curl, CURLOPT_POST, true);
 
@@ -125,7 +124,7 @@ abstract class GatewayPlugin extends AbstractPlugin
         }
 
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        $headers = array();
+        $headers = [];
         if (preg_match_all('#^([^:\r\n]+):\s+([^\n\r]+)#m', substr($returnTransfer, 0, $headerSize), $matches)) {
             foreach ($matches[1] as $key => $name) {
                 $headers[$name] = $matches[2][$key];

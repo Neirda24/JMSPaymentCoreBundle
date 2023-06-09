@@ -4,9 +4,9 @@ namespace JMS\Payment\CoreBundle\Tests\Functional;
 
 class PaymentWorkflowMcryptTest extends PaymentWorkflowTest
 {
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
-        return parent::createKernel(array('config' => 'config_mcrypt.yml'));
+        return parent::createKernel(['config' => 'config_mcrypt.yml']);
     }
 
     /**
@@ -14,9 +14,9 @@ class PaymentWorkflowMcryptTest extends PaymentWorkflowTest
      */
     public function testPaymentDetails()
     {
-        if (version_compare(phpversion(), '7.1', '>=')) {
-            $this->markTestSkipped('mcrypt is deprecated since PHP 7.1');
-        }
+//        if (version_compare(phpversion(), '7.1', '>=')) {
+//            $this->markTestSkipped('mcrypt is deprecated since PHP 7.1');
+//        }
 
         $order = parent::doTestPaymentDetails();
 

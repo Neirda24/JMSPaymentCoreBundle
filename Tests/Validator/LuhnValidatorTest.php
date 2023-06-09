@@ -2,20 +2,22 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Validator;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Context\ExecutionContext;
 use JMS\Payment\CoreBundle\Util\Legacy;
 use JMS\Payment\CoreBundle\Validator\Luhn;
 use JMS\Payment\CoreBundle\Validator\LuhnValidator;
 
-class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
+class LuhnValidatorTest extends TestCase
 {
     protected $context;
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = Legacy::isOldPathExecutionContext()
             ? $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            : $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
+            : $this->getMockBuilder(ExecutionContext::class)
         ;
 
         $this->context = $this->context
@@ -27,7 +29,7 @@ class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($this->context);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->context = null;
         $this->validator = null;
@@ -62,26 +64,7 @@ class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function getValidNumbers()
     {
-        return array(
-            array('42424242424242424242'),
-            array('378282246310005'),
-            array('371449635398431'),
-            array('378734493671000'),
-            array('5610591081018250'),
-            array('30569309025904'),
-            array('38520000023237'),
-            array('6011111111111117'),
-            array('6011000990139424'),
-            array('3530111333300000'),
-            array('3566002020360505'),
-            array('5555555555554444'),
-            array('5105105105105100'),
-            array('4111111111111111'),
-            array('4012888888881881'),
-            array('4222222222222'),
-            array('5019717010103742'),
-            array('6331101999990016'),
-        );
+        return [['42424242424242424242'], ['378282246310005'], ['371449635398431'], ['378734493671000'], ['5610591081018250'], ['30569309025904'], ['38520000023237'], ['6011111111111117'], ['6011000990139424'], ['3530111333300000'], ['3566002020360505'], ['5555555555554444'], ['5105105105105100'], ['4111111111111111'], ['4012888888881881'], ['4222222222222'], ['5019717010103742'], ['6331101999990016']];
     }
 
     /**
@@ -100,9 +83,6 @@ class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function getInvalidNumbers()
     {
-        return array(
-            array('1234567812345678'),
-            array('4222222222222222'),
-        );
+        return [['1234567812345678'], ['4222222222222222']];
     }
 }

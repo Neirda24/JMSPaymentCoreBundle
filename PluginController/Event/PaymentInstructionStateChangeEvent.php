@@ -2,22 +2,17 @@
 
 namespace JMS\Payment\CoreBundle\PluginController\Event;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
-use Symfony\Component\EventDispatcher\Event;
 
 class PaymentInstructionStateChangeEvent extends Event
 {
-    private $paymentInstruction;
-    private $oldState;
-
-    public function __construct(PaymentInstructionInterface $paymentInstruction, $oldState)
+    public function __construct(private PaymentInstructionInterface $paymentInstruction, private $oldState)
     {
-        $this->paymentInstruction = $paymentInstruction;
-        $this->oldState = $oldState;
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInstructionInterface
+     * @return PaymentInstructionInterface
      */
     public function getPaymentInstruction()
     {

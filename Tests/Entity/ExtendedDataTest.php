@@ -2,9 +2,11 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 
-class ExtendedDataTest extends \PHPUnit_Framework_TestCase
+class ExtendedDataTest extends TestCase
 {
     public function testRemoveIgnoresIfKeyDoesNotExist()
     {
@@ -26,38 +28,30 @@ class ExtendedDataTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($data->has('foo'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testIsEncryptionRequiredThrowsExceptionOnNonExistentKey()
     {
+        $this->expectException(InvalidArgumentException::class);
         $extendedData = new ExtendedData();
         $extendedData->isEncryptionRequired('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMayBePersistedThrowsExceptionOnNonExistentKey()
     {
+        $this->expectException(InvalidArgumentException::class);
         $extendedData = new ExtendedData();
         $extendedData->mayBePersisted('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetThrowsExceptionOnNonExistentKey()
     {
+        $this->expectException(InvalidArgumentException::class);
         $extendedData = new ExtendedData();
         $extendedData->get('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetThrowsExceptionOnEncryptionOfNonPersistedValue()
     {
+        $this->expectException(InvalidArgumentException::class);
         $extendedData = new ExtendedData();
         $extendedData->set('foo', 'bar', true, false);
     }
@@ -87,10 +81,6 @@ class ExtendedDataTest extends \PHPUnit_Framework_TestCase
 
     public function getTestData()
     {
-        return array(
-            array('account_holder', 'fooholder', false, true),
-            array('account_number', '1234567890', true, true),
-            array('account_cvv', '666', false, false),
-        );
+        return [['account_holder', 'fooholder', false, true], ['account_number', '1234567890', true, true], ['account_cvv', '666', false, false]];
     }
 }

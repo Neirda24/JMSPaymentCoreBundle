@@ -2,6 +2,8 @@
 
 namespace JMS\Payment\CoreBundle\Tests\PluginController;
 
+use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 use JMS\Payment\CoreBundle\Entity\Credit;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\FinancialTransaction;
@@ -9,14 +11,13 @@ use JMS\Payment\CoreBundle\Entity\Payment;
 use JMS\Payment\CoreBundle\Entity\PaymentInstruction;
 use JMS\Payment\CoreBundle\Plugin\Exception\Exception;
 use JMS\Payment\CoreBundle\PluginController\Result;
+use LogicException;
 
-class ResultTest extends \PHPUnit_Framework_TestCase
+class ResultTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithInvalidArguments()
     {
+        $this->expectException(InvalidArgumentException::class);
         new Result();
     }
 
@@ -101,11 +102,9 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result->isAttentionRequired());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testIsPaymentAttentionRequiredThrowsExceptionWhenResultHasNoPayment()
     {
+        $this->expectException(LogicException::class);
         $result = new Result(new PaymentInstruction(123.45, 'EUR', 'foo', new ExtendedData()), Result::STATUS_FAILED, 'foo');
 
         $result->isAttentionRequired();

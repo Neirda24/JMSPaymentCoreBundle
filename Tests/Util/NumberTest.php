@@ -2,9 +2,10 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use JMS\Payment\CoreBundle\Util\Number;
 
-class NumberTest extends \PHPUnit_Framework_TestCase
+class NumberTest extends TestCase
 {
     /**
      * @dataProvider getComparisonTests
@@ -16,24 +17,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
 
     public function getComparisonTests()
     {
-        return array(
-            array(0, 0, '==', true),
-            array(0.0, 0.0, '==', true),
-            array(0.0, 0.0, '>=', true),
-            array(0.0, 0.0, '<=', true),
-            array(0.0, 0.0, '>', false),
-            array(0.0, 0.0, '<', false),
-            array(0.1, 0.0, '==', false),
-            array(0.1, 0.0, '>', true),
-            array(0.1, 0.0, '>=', true),
-            array(0.1, 0.0, '<', false),
-            array(0.1, 0.0, '<=', false),
-            array(0.0, 0.1, '==', false),
-            array(0.0, 0.1, '>=', false),
-            array(0.0, 0.1, '>', false),
-            array(0.0, 0.1, '<=', true),
-            array(0.0, 0.1, '<', true),
-        );
+        return [[0, 0, '==', true], [0.0, 0.0, '==', true], [0.0, 0.0, '>=', true], [0.0, 0.0, '<=', true], [0.0, 0.0, '>', false], [0.0, 0.0, '<', false], [0.1, 0.0, '==', false], [0.1, 0.0, '>', true], [0.1, 0.0, '>=', true], [0.1, 0.0, '<', false], [0.1, 0.0, '<=', false], [0.0, 0.1, '==', false], [0.0, 0.1, '>=', false], [0.0, 0.1, '>', false], [0.0, 0.1, '<=', true], [0.0, 0.1, '<', true]];
     }
 
     /**
@@ -46,11 +30,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
 
     public function getEqualFloats()
     {
-        return array(
-            array(0, 0),
-            array(1.12, 1.12),
-            array(1.123456789, 1.123456788),
-        );
+        return [[0, 0], [1.12, 1.12], [1.123456789, 1.123456788]];
     }
 
     /**
@@ -63,11 +43,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
 
     public function getSmallerFloats()
     {
-        return array(
-            array(0, 1),
-            array(0.12, 0.123),
-            array(0.1234, 0.1235),
-        );
+        return [[0, 1], [0.12, 0.123], [0.1234, 0.1235]];
     }
 
     /**
@@ -80,10 +56,6 @@ class NumberTest extends \PHPUnit_Framework_TestCase
 
     public function getGreaterFloats()
     {
-        return array(
-            array(1, 0),
-            array(0.123, 0.12),
-            array(0.1235, 0.1234),
-        );
+        return [[1, 0], [0.123, 0.12], [0.1235, 0.1234]];
     }
 }

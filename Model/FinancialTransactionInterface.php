@@ -20,34 +20,34 @@ namespace JMS\Payment\CoreBundle\Model;
 
 interface FinancialTransactionInterface
 {
-    const STATE_CANCELED = 1;
-    const STATE_FAILED = 2;
-    const STATE_NEW = 3;
-    const STATE_PENDING = 4;
-    const STATE_SUCCESS = 5;
+    public const STATE_CANCELED = 1;
+    public const STATE_FAILED = 2;
+    public const STATE_NEW = 3;
+    public const STATE_PENDING = 4;
+    public const STATE_SUCCESS = 5;
 
-    const TRANSACTION_TYPE_APPROVE = 1;
-    const TRANSACTION_TYPE_APPROVE_AND_DEPOSIT = 2;
-    const TRANSACTION_TYPE_CREDIT = 3;
-    const TRANSACTION_TYPE_DEPOSIT = 4;
-    const TRANSACTION_TYPE_REVERSE_APPROVAL = 5;
-    const TRANSACTION_TYPE_REVERSE_CREDIT = 6;
-    const TRANSACTION_TYPE_REVERSE_DEPOSIT = 7;
+    public const TRANSACTION_TYPE_APPROVE = 1;
+    public const TRANSACTION_TYPE_APPROVE_AND_DEPOSIT = 2;
+    public const TRANSACTION_TYPE_CREDIT = 3;
+    public const TRANSACTION_TYPE_DEPOSIT = 4;
+    public const TRANSACTION_TYPE_REVERSE_APPROVAL = 5;
+    public const TRANSACTION_TYPE_REVERSE_CREDIT = 6;
+    public const TRANSACTION_TYPE_REVERSE_DEPOSIT = 7;
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\CreditInterface|null
+     * @return CreditInterface|null
      */
     public function getCredit();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\ExtendedDataInterface|null
+     * @return ExtendedDataInterface|null
      */
     public function getExtendedData();
 
     public function getId();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInterface|null
+     * @return PaymentInterface|null
      */
     public function getPayment();
 

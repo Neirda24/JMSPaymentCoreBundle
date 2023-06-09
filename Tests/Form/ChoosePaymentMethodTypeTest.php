@@ -2,6 +2,8 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Form\ChoosePaymentMethodTypeTest;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use JMS\Payment\CoreBundle\PluginController\PluginControllerInterface;
 use JMS\Payment\CoreBundle\Form\ChoosePaymentMethodType;
 use JMS\Payment\CoreBundle\Tests\Functional\TestPlugin\Form\TestPluginType;
 use JMS\Payment\CoreBundle\Util\Legacy;
@@ -11,26 +13,18 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class ChoosePaymentMethodTypeTest extends TypeTestCase
 {
-    /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage amount
-     */
     public function testAmountIsRequired()
     {
-        $form = $this->createForm(array(
-            'amount' => null,
-        ));
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('amount');
+        $form = $this->createForm(['amount' => null]);
     }
 
-    /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage currency
-     */
     public function testCurrencyIsRequired()
     {
-        $form = $this->createForm(array(
-            'currency' => null,
-        ));
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('currency');
+        $form = $this->createForm(['currency' => null]);
     }
 
     public function testMethod()
@@ -44,13 +38,13 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
     {
         $form = $this->createForm();
 
-        foreach (array('foo', 'bar') as $method) {
+        foreach (['foo', 'bar'] as $method) {
             $this->assertTrue($form->has('data_'.$method));
 
             $config = $form->get('data_'.$method)->getConfig();
 
             $this->assertInstanceOf(
-                'JMS\Payment\CoreBundle\Tests\Functional\TestPlugin\Form\TestPluginType',
+                TestPluginType::class,
                 $config->getType()->getInnerType()
             );
         }
@@ -64,10 +58,11 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
 
         $form = $this->createForm();
 
-        $this->assertArraySubset(array(
-            'form.label.foo' => 'foo',
-            'form.label.bar' => 'bar',
-        ), $form->get('method')->getConfig()->getOption('choices'));
+        $choices = $form->get('method')->getConfig()->getOption('choices');
+        foreach (['form.label.foo' => 'foo', 'form.label.bar' => 'bar'] as $key => $value) {
+            $this->assertArrayHasKey($key, $choices);
+            $this->assertSame($value, $choices[$key]);
+        }
     }
 
     public function testLegacyMethodChoices()
@@ -78,26 +73,22 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
 
         $form = $this->createForm();
 
-        $expected = array(
-            'foo' => 'form.label.foo',
-            'bar' => 'form.label.bar',
-        );
+        $expected = ['foo' => 'form.label.foo', 'bar' => 'form.label.bar'];
 
         if (version_compare(Kernel::VERSION, '2.7.0', '>=')) {
-            $expected = array(
-                'foo' => 0,
-                'bar' => 1,
-            );
+            $expected = ['foo' => 0, 'bar' => 1];
         }
 
-        $this->assertArraySubset($expected, $form->get('method')->getConfig()->getOption('choices'));
+        $choices = $form->get('method')->getConfig()->getOption('choices');
+        foreach ($expected as $key => $value) {
+            $this->assertArrayHasKey($key, $choices);
+            $this->assertSame($value, $choices[$key]);
+        }
     }
 
     public function testDefaultMethod()
     {
-        $form = $this->createForm(array(
-            'default_method' => 'foo',
-        ));
+        $form = $this->createForm(['default_method' => 'foo']);
 
         $this->assertEquals('foo', $form->get('method')->getConfig()->getOption('data'));
     }
@@ -108,13 +99,15 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
             $this->markTestSkipped();
         }
 
-        $form = $this->createForm(array(
-            'allowed_methods' => array('bar'),
-        ));
+        $form = $this->createForm(['allowed_methods' => ['bar']]);
 
         $choices = $form->get('method')->getConfig()->getOption('choices');
         $this->assertArrayNotHasKey('form.label.foo', $choices);
-        $this->assertArraySubset(array('form.label.bar' => 'bar'), $choices);
+
+        foreach (['form.label.bar' => 'bar'] as $key => $value) {
+            $this->assertArrayHasKey($key, $choices);
+            $this->assertSame($value, $choices[$key]);
+        }
 
         $this->assertTrue($form->has('data_bar'));
         $this->assertFalse($form->has('data_foo'));
@@ -126,55 +119,45 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
             $this->markTestSkipped();
         }
 
-        $form = $this->createForm(array(
-            'allowed_methods' => array('bar'),
-        ));
+        $form = $this->createForm(['allowed_methods' => ['bar']]);
 
         $choices = $form->get('method')->getConfig()->getOption('choices');
         $this->assertArrayNotHasKey('foo', $choices);
-        $this->assertArraySubset(array('bar' => 'form.label.bar'), $choices);
+        foreach (['bar' => 'form.label.bar'] as $key => $value) {
+            $this->assertArrayHasKey($key, $choices);
+            $this->assertSame($value, $choices[$key]);
+        }
     }
 
     public function testMethodOptions()
     {
-        $form = $this->createForm(array('method_options' => array(
-            'foo' => array(
-                'attr' => array('foo_attr'),
-            ),
-            'bar' => array(
-                'attr' => array('bar_attr'),
-            ),
-        )));
+        $form = $this->createForm(['method_options' => ['foo' => ['attr' => ['foo_attr']], 'bar' => ['attr' => ['bar_attr']]]]);
 
-        foreach (array('foo', 'bar') as $method) {
-            $this->assertArraySubset(
-                array($method.'_attr'),
-                $form->get('data_'.$method)->getConfig()->getOption('attr')
-            );
+        foreach (['foo', 'bar'] as $method) {
+            $choices = $form->get('data_'.$method)->getConfig()->getOption('attr');
+
+            foreach ([$method.'_attr'] as $key => $value) {
+                $this->assertArrayHasKey($key, $choices);
+                $this->assertSame($value, $choices[$key]);
+            }
         }
     }
 
     public function testChoiceOptions()
     {
-        $form = $this->createForm(array('choice_options' => array(
-            'expanded' => false,
-            'data' => 'baz',
-        )));
+        $form = $this->createForm(['choice_options' => ['expanded' => false, 'data' => 'baz']]);
 
         $config = $form->get('method')->getConfig();
         $this->assertFalse($config->getOption('expanded'));
         $this->assertEquals('baz', $config->getOption('data'));
     }
 
-    private function createForm($options = array(), $data = array())
+    private function createForm($options = [], $data = [])
     {
-        $options = array_merge(array(
-            'amount' => '10.42',
-            'currency' => 'EUR',
-        ), $options);
+        $options = array_merge(['amount' => '10.42', 'currency' => 'EUR'], $options);
 
         $form = Legacy::supportsFormTypeClass()
-            ? 'JMS\Payment\CoreBundle\Form\ChoosePaymentMethodType'
+            ? ChoosePaymentMethodType::class
             : 'jms_choose_payment_method'
         ;
 
@@ -184,10 +167,9 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
         return $form;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->pluginController = $this->getMockBuilder('JMS\Payment\CoreBundle\PluginController\PluginControllerInterface')
-            ->getMock();
+        $this->pluginController = $this->createMock(PluginControllerInterface::class);
 
         parent::setUp();
     }
@@ -197,25 +179,19 @@ class ChoosePaymentMethodTypeTest extends TypeTestCase
         $pluginType = new TestPluginType();
 
         if (Legacy::supportsFormTypeClass()) {
-            $pluginTypeName = get_class($pluginType);
+            $pluginTypeName = $pluginType::class;
         } else {
-            $pluginTypeName = $pluginType->getName();
+            $pluginTypeName = $pluginType->getBlockPrefix();
         }
 
-        $type = new ChoosePaymentMethodType($this->pluginController, array(
-            'foo' => $pluginTypeName,
-            'bar' => $pluginTypeName,
-        ));
+        $type = new ChoosePaymentMethodType($this->pluginController, ['foo' => $pluginTypeName, 'bar' => $pluginTypeName]);
 
         if (Legacy::supportsFormTypeClass()) {
-            $extensions = array($pluginType, $type);
+            $extensions = [$pluginType, $type];
         } else {
-            $extensions = array(
-                $pluginType->getName() => $pluginType,
-                $type->getName() => $type,
-            );
+            $extensions = [$pluginType->getBlockPrefix() => $pluginType, $type->getName() => $type];
         }
 
-        return array(new PreloadedExtension($extensions, array()));
+        return [new PreloadedExtension($extensions, [])];
     }
 }

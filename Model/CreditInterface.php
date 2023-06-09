@@ -20,11 +20,11 @@ namespace JMS\Payment\CoreBundle\Model;
 
 interface CreditInterface
 {
-    const STATE_CANCELED = 1;
-    const STATE_CREDITED = 2;
-    const STATE_CREDITING = 3;
-    const STATE_FAILED = 4;
-    const STATE_NEW = 5;
+    public const STATE_CANCELED = 1;
+    public const STATE_CREDITED = 2;
+    public const STATE_CREDITING = 3;
+    public const STATE_FAILED = 4;
+    public const STATE_NEW = 5;
 
     public function getCreditedAmount();
     public function getCreditingAmount();
@@ -32,22 +32,22 @@ interface CreditInterface
     public function getId();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInterface
+     * @return PaymentInterface
      */
     public function getPayment();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInstructionInterface
+     * @return PaymentInstructionInterface
      */
     public function getPaymentInstruction();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface|null
+     * @return FinancialTransactionInterface|null
      */
     public function getPendingTransaction();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface[]
+     * @return FinancialTransactionInterface[]
      */
     public function getReverseCreditTransactions();
 

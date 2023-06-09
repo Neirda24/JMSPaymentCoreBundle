@@ -20,11 +20,8 @@ namespace JMS\Payment\CoreBundle\Plugin\Exception\Action;
 
 class VisitUrl
 {
-    protected $url;
-
-    public function __construct($url)
+    public function __construct(protected $url)
     {
-        $this->url = $url;
     }
 
     public function getUrl()

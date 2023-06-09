@@ -40,7 +40,7 @@ class EntityPluginController extends PluginController
 {
     protected $entityManager;
 
-    public function __construct(EntityManager $entityManager, $options = array(), EventDispatcherInterface $dispatcher = null)
+    public function __construct(EntityManager $entityManager, $options = [], EventDispatcherInterface $dispatcher = null)
     {
         parent::__construct($options, $dispatcher);
 
@@ -218,7 +218,7 @@ class EntityPluginController extends PluginController
 
                 $this->entityManager->persist($credit);
                 $this->entityManager->flush();
-            } catch (PluginFunctionNotSupportedException $notSupported) {
+            } catch (PluginFunctionNotSupportedException) {
             }
         }
 
@@ -243,7 +243,7 @@ class EntityPluginController extends PluginController
 
                 $this->entityManager->persist($payment);
                 $this->entityManager->flush();
-            } catch (PluginFunctionNotSupportedException $notSupported) {
+            } catch (PluginFunctionNotSupportedException) {
             }
         }
 
@@ -363,7 +363,7 @@ class EntityPluginController extends PluginController
 
     protected function doGetPaymentInstruction($id)
     {
-        $paymentInstruction = $this->entityManager->getRepository($this->options['payment_instruction_class'])->findOneBy(array('id' => $id));
+        $paymentInstruction = $this->entityManager->getRepository($this->options['payment_instruction_class'])->findOneBy(['id' => $id]);
 
         if (null === $paymentInstruction) {
             throw new PaymentInstructionNotFoundException(sprintf('The payment instruction with ID "%d" was not found.', $id));
@@ -372,7 +372,7 @@ class EntityPluginController extends PluginController
         return $paymentInstruction;
     }
 
-    protected function doRollback(\Exception $failure)
+    protected function doRollback(\Exception $failure): never
     {
         $this->entityManager->getConnection()->rollback();
 

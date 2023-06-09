@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Form\Transformer;
 
+use Closure;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\PaymentInstruction;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -42,10 +43,7 @@ class ChoosePaymentMethodTransformer implements DataTransformerInterface
             $methodData = array_diff_key($methodData, $this->options['predefined_data'][$method]);
         }
 
-        return array(
-            'method'        => $method,
-            'data_'.$method => $methodData,
-        );
+        return ['method'        => $method, 'data_'.$method => $methodData];
     }
 
     /**
@@ -69,7 +67,7 @@ class ChoosePaymentMethodTransformer implements DataTransformerInterface
             throw new TransformationFailedException("The 'currency' option must be supplied to the form");
         }
 
-        $method = isset($data['method']) ? $data['method'] : null;
+        $method = $data['method'] ?? null;
 
         if (isset($this->options['predefined_data'][$method])) {
             if (!is_array($this->options['predefined_data'][$method])) {
@@ -77,7 +75,7 @@ class ChoosePaymentMethodTransformer implements DataTransformerInterface
             }
         }
 
-        $data = isset($data['data_'.$method]) ? $data['data_'.$method] : array();
+        $data = $data['data_'.$method] ?? [];
         $extendedData = new ExtendedData();
         foreach ($data as $key => $value) {
             $extendedData->set($key, $value);
@@ -90,7 +88,7 @@ class ChoosePaymentMethodTransformer implements DataTransformerInterface
         }
 
         $amount = $this->options['amount'];
-        if ($amount instanceof \Closure) {
+        if ($amount instanceof Closure) {
             $amount = $amount($this->options['currency'], $method, $extendedData);
         }
 
@@ -102,7 +100,7 @@ class ChoosePaymentMethodTransformer implements DataTransformerInterface
         $type = gettype($data);
 
         if ($type === 'object') {
-            $type = get_class($data);
+            $type = $data::class;
         }
 
         return $type;

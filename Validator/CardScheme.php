@@ -37,6 +37,6 @@ class CardScheme extends Constraint
 
     public function getRequiredOptions()
     {
-        return array('schemes');
+        return ['schemes'];
     }
 }

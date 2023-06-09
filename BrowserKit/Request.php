@@ -23,15 +23,11 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Request
 {
-    protected $method;
-    protected $uri;
-    public $request;
-    public $headers;
+    public ParameterBag $request;
+    public HeaderBag $headers;
 
-    public function __construct($uri, $method, array $request = array(), array $headers = array())
+    public function __construct(protected $uri, protected $method, array $request = [], array $headers = [])
     {
-        $this->uri = $uri;
-        $this->method = $method;
         $this->request = new ParameterBag($request);
         $this->headers = new HeaderBag($headers);
     }

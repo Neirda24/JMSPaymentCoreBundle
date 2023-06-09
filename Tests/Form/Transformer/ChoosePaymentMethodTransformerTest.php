@@ -5,20 +5,19 @@ namespace JMS\Payment\CoreBundle\Tests\Form\Transformer;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\PaymentInstruction;
 use JMS\Payment\CoreBundle\Form\Transformer\ChoosePaymentMethodTransformer;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
-class ChoosePaymentMethodTransformerTest extends \PHPUnit_Framework_TestCase
+class ChoosePaymentMethodTransformerTest extends TestCase
 {
     public function testTransformNullData()
     {
         $this->assertNull($this->transform(null));
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage JMS\Payment\CoreBundle\Tests\Form\Transformer\ChoosePaymentMethodTransformerTest
-     */
     public function testTransformNotPaymentInstructionObject()
     {
+        $this->expectException(TransformationFailedException::class);
         $this->transform(new self());
     }
 
@@ -30,12 +29,10 @@ class ChoosePaymentMethodTransformerTest extends \PHPUnit_Framework_TestCase
 
         $transformed = $this->transform(new PaymentInstruction('10.42', 'EUR', $method, $data));
 
-        $this->assertArraySubset(array(
-            'method' => 'foo',
-            'data_foo' => array(
-                'bar' => 'baz',
-            ),
-        ), $transformed);
+        foreach (['method' => 'foo', 'data_foo' => ['bar' => 'baz']] as $key => $value) {
+            $this->assertArrayHasKey($key, $transformed);
+            $this->assertSame($value, $transformed[$key]);
+        }
     }
 
     public function testTransformPredefinedData()
@@ -44,13 +41,7 @@ class ChoosePaymentMethodTransformerTest extends \PHPUnit_Framework_TestCase
         $data = new ExtendedData();
         $data->set('bar', 'baz');
 
-        $options = array(
-            'predefined_data' => array(
-                $method => array(
-                    'bar' => 'bar_predefined',
-                ),
-            ),
-        );
+        $options = ['predefined_data' => [$method => ['bar' => 'bar_predefined']]];
 
         $transformed = $this->transform(new PaymentInstruction('10.42', 'EUR', $method, $data), $options);
 
@@ -62,43 +53,32 @@ class ChoosePaymentMethodTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->reverseTransform(null));
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage JMS\Payment\CoreBundle\Tests\Form\Transformer\ChoosePaymentMethodTransformerTest
-     */
     public function testReverseTransformNotArray()
     {
+        $this->expectException(TransformationFailedException::class);
         $this->reverseTransform(new self());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The 'amount' option must be supplied to the form
-     */
     public function testReverseTransformNoAmount()
     {
-        $this->reverseTransform(array());
+        $this->expectException(TransformationFailedException::class);
+        $this->reverseTransform([]);
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The 'currency' option must be supplied to the form
-     */
     public function testReverseTransformNoCurrency()
     {
-        $this->reverseTransform(array(), array('amount' => '10.42'));
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage("The 'currency' option must be supplied to the form");
+        $this->reverseTransform([], ['amount' => '10.42']);
     }
 
     public function testReverseTransform()
     {
-        $options = array(
-            'currency' => 'EUR',
-            'amount' => '10.42',
-        );
+        $options = ['currency' => 'EUR', 'amount' => '10.42'];
 
-        $pi = $this->reverseTransform(array('method' => 'foo'), $options);
+        $pi = $this->reverseTransform(['method' => 'foo'], $options);
 
-        $this->assertInstanceOf('JMS\Payment\CoreBundle\Entity\PaymentInstruction', $pi);
+        $this->assertInstanceOf(PaymentInstruction::class, $pi);
         $this->assertEquals('foo', $pi->getPaymentSystemName());
         $this->assertEquals('10.42', $pi->getAmount());
         $this->assertEquals('EUR', $pi->getCurrency());
@@ -106,53 +86,31 @@ class ChoosePaymentMethodTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testReverseTransformAmountClosure()
     {
-        $options = array(
-            'currency' => 'EUR',
-            'amount' => function () {
-                return '10.42';
-            },
-        );
+        $options = ['currency' => 'EUR', 'amount' => fn() => '10.42'];
 
-        $pi = $this->reverseTransform(array(), $options);
+        $pi = $this->reverseTransform([], $options);
 
         $this->assertEquals('10.42', $pi->getAmount());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage JMS\Payment\CoreBundle\Tests\Form\Transformer\ChoosePaymentMethodTransformerTest
-     */
     public function testReverseTransformPredefinedDataWrongType()
     {
-        $options = array(
-            'currency' => 'EUR',
-            'amount' => '10.42',
-            'predefined_data' => array(
-                'foo' => new self(),
-            ),
-        );
+        $this->expectException(TransformationFailedException::class);
+        $options = ['currency' => 'EUR', 'amount' => '10.42', 'predefined_data' => ['foo' => new self()]];
 
-        $pi = $this->reverseTransform(array('method' => 'foo'), $options);
+        $pi = $this->reverseTransform(['method' => 'foo'], $options);
     }
 
     public function testReverseTransformPredefinedData()
     {
-        $options = array(
-            'currency' => 'EUR',
-            'amount' => '10.42',
-            'predefined_data' => array(
-                'foo' => array(
-                    'bar' => 'baz',
-                ),
-            ),
-        );
+        $options = ['currency' => 'EUR', 'amount' => '10.42', 'predefined_data' => ['foo' => ['bar' => 'baz']]];
 
-        $pi = $this->reverseTransform(array('method' => 'foo'), $options);
+        $pi = $this->reverseTransform(['method' => 'foo'], $options);
 
         $this->assertEquals('baz', $pi->getExtendedData()->get('bar'));
     }
 
-    private function transform($instruction, $options = array())
+    private function transform($instruction, $options = [])
     {
         $transformer = new ChoosePaymentMethodTransformer();
         $transformer->setOptions($options);
@@ -160,7 +118,7 @@ class ChoosePaymentMethodTransformerTest extends \PHPUnit_Framework_TestCase
         return $transformer->transform($instruction);
     }
 
-    private function reverseTransform($data, $options = array())
+    private function reverseTransform($data, $options = [])
     {
         $transformer = new ChoosePaymentMethodTransformer();
         $transformer->setOptions($options);

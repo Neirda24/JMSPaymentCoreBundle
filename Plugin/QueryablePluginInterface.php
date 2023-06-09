@@ -34,7 +34,6 @@ interface QueryablePluginInterface extends PluginInterface
      * This method gets the available balance for the specified
      * PaymentInstruction account.
      *
-     * @param PaymentInstructionInterface $paymentInstruction
      *
      * @return float|null Returns the amount that may be consumed by the payment, or null of it cannot be determined
      */
@@ -43,16 +42,12 @@ interface QueryablePluginInterface extends PluginInterface
     /**
      * This method updates the given Credit object with data from the
      * payment backend system.
-     *
-     * @param CreditInterface $credit
      */
     public function updateCredit(CreditInterface $credit);
 
     /**
      * This method updates the given Payment object with data from the
      * payment backend system.
-     *
-     * @param PaymentInterface $payment
      */
     public function updatePayment(PaymentInterface $payment);
 }

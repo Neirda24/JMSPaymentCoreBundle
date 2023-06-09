@@ -2,6 +2,8 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
+use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Payment\CoreBundle\Entity\Credit;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\FinancialTransaction;
@@ -10,7 +12,7 @@ use JMS\Payment\CoreBundle\Entity\PaymentInstruction;
 use JMS\Payment\CoreBundle\Model\CreditInterface;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 
-class CreditTest extends \PHPUnit_Framework_TestCase
+class CreditTest extends TestCase
 {
     public function testConstructor()
     {
@@ -19,7 +21,7 @@ class CreditTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($instruction, $credit->getPaymentInstruction());
         $this->assertEquals(0.0, $credit->getCreditedAmount());
         $this->assertEquals(0.0, $credit->getCreditingAmount());
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $credit->getTransactions());
+        $this->assertInstanceOf(ArrayCollection::class, $credit->getTransactions());
         $this->assertEquals(0, count($credit->getTransactions()));
         $this->assertEquals(0.0, $credit->getReversingAmount());
         $this->assertSame(CreditInterface::STATE_NEW, $credit->getState());
@@ -151,12 +153,7 @@ class CreditTest extends \PHPUnit_Framework_TestCase
 
     public function getSimpleTestData()
     {
-        return array(
-            array('CreditingAmount', 123.45, 0.0),
-            array('CreditedAmount', 643.12, 0.0),
-            array('ReversingAmount', 453.14, 0.0),
-            array('State', CreditInterface::STATE_CANCELED, CreditInterface::STATE_NEW),
-        );
+        return [['CreditingAmount', 123.45, 0.0], ['CreditedAmount', 643.12, 0.0], ['ReversingAmount', 453.14, 0.0], ['State', CreditInterface::STATE_CANCELED, CreditInterface::STATE_NEW]];
     }
 
     public function testSetGetPayment()

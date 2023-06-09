@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\PluginController;
 
+use JMS\Payment\CoreBundle\PluginController\Exception\InvalidPaymentInstructionException;
 use JMS\Payment\CoreBundle\Model\CreditInterface;
 use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 use JMS\Payment\CoreBundle\Model\PaymentInterface;
@@ -73,7 +74,7 @@ interface PluginControllerInterface
      * - rollback the transaction
      * - not persist any changes in the database
      *
-     * @throws JMS\Payment\CoreBundle\PluginController\Exception\InvalidPaymentInstructionException if the PaymentInstruction is not in the desired state
+     * @throws InvalidPaymentInstructionException if the PaymentInstruction is not in the desired state
      *
      * @param int   $paymentId
      * @param float $amount

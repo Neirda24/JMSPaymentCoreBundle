@@ -2,9 +2,13 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
+use JMS\Payment\CoreBundle\Model\CreditInterface;
+use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
+use JMS\Payment\CoreBundle\Model\PaymentInterface;
 use JMS\Payment\CoreBundle\Entity\FinancialTransaction;
 
-class FinancialTransactionTest extends \PHPUnit_Framework_TestCase
+class FinancialTransactionTest extends TestCase
 {
     public function testConstructor()
     {
@@ -20,7 +24,7 @@ class FinancialTransactionTest extends \PHPUnit_Framework_TestCase
     public function testSetGetCredit()
     {
         $transaction = new FinancialTransaction();
-        $credit = $this->getMockBuilder('JMS\Payment\CoreBundle\Model\CreditInterface')->getMock();
+        $credit = $this->createMock(CreditInterface::class);
 
         $this->assertNull($transaction->getCredit());
         $transaction->setCredit($credit);
@@ -30,7 +34,7 @@ class FinancialTransactionTest extends \PHPUnit_Framework_TestCase
     public function testSetGetExtendedData()
     {
         $transaction = new FinancialTransaction();
-        $extendedData = $this->getMockBuilder('JMS\Payment\CoreBundle\Model\ExtendedDataInterface')->getMock();
+        $extendedData = $this->createMock(ExtendedDataInterface::class);
 
         $this->assertNull($transaction->getExtendedData());
         $transaction->setExtendedData($extendedData);
@@ -40,7 +44,7 @@ class FinancialTransactionTest extends \PHPUnit_Framework_TestCase
     public function testSetGetPayment()
     {
         $transaction = new FinancialTransaction();
-        $payment = $this->getMockBuilder('JMS\Payment\CoreBundle\Model\PaymentInterface')->getMock();
+        $payment = $this->createMock(PaymentInterface::class);
 
         $this->assertNull($transaction->getPayment());
         $transaction->setPayment($payment);

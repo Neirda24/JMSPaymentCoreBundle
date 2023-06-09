@@ -2,17 +2,20 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Cryptography;
 
+use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 use JMS\Payment\CoreBundle\Cryptography\MCryptEncryptionService;
+use LogicException;
 
-class MCryptEncryptionServiceTest extends \PHPUnit_Framework_TestCase
+class MCryptEncryptionServiceTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
-        if (version_compare(phpversion(), '7.1', '>=')) {
-            $this->markTestSkipped('mcrypt is deprecated since PHP 7.1');
-        }
+//        if (version_compare(phpversion(), '7.1', '>=')) {
+//            $this->markTestSkipped('mcrypt is deprecated since PHP 7.1');
+//        }
 
-        if (false !== strpos(PHP_OS, 'WIN')) {
+        if (str_contains(PHP_OS, 'WIN')) {
             $this->markTestSkipped('Windows is not suited for generating random data.');
         }
     }
@@ -24,24 +27,22 @@ class MCryptEncryptionServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('rijndael-256', $service->getCipher());
         $this->assertEquals('ctr', $service->getMode());
         $this->assertTrue('foo' != $service->getKey());
-        $this->assertTrue(preg_match('/[^\x00-\x7F]/S', $service->getKey()) > 0, 'Key must not be ASCII');
+        $this->assertTrue(preg_match('/[^\x00-\x7F]/S', (string) $service->getKey()) > 0, 'Key must not be ASCII');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedMessage The mode "foomode" is not supported.
-     */
     public function testConstructorWithInvalidMode()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The mode "foomode" is not supported.');
+
         $service = new MCryptEncryptionService('foo', 'rijndael-256', 'foomode');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedMessage The cipher "foocipher" is not supported.
-     */
     public function testConstructorWithInvalidCipher()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cipher "foocipher" is not supported.');
+
         $service = new MCryptEncryptionService('foo', 'foocipher');
     }
 
@@ -67,12 +68,6 @@ class MCryptEncryptionServiceTest extends \PHPUnit_Framework_TestCase
 
     public function getTestData()
     {
-        return array(
-            array('this is some test data, very sensitive stuff'),
-            array('12345674234'),
-            array('123'),
-            array('4565-3346-2124-5653'),
-            array('HDarfg$§fasHaha&$%§'),
-        );
+        return [['this is some test data, very sensitive stuff'], ['12345674234'], ['123'], ['4565-3346-2124-5653'], ['HDarfg$§fasHaha&$%§']];
     }
 }

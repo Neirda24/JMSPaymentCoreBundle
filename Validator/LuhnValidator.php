@@ -49,7 +49,7 @@ class LuhnValidator extends ConstraintValidator
             $this->context->addViolation($constraint->message);
         }
 
-        $length = strlen($value);
+        $length = strlen((string) $value);
         $oddLength = $length % 2;
         for ($sum = 0, $i = $length - 1; $i >= 0; --$i) {
             $digit = (int) $value[$i];

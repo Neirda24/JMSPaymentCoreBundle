@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Plugin\Exception;
 
+use Exception;
 /*
  * Copyright 2010 Johannes M. Schmitt <schmittjoh@gmail.com>
  *
@@ -17,7 +18,6 @@ namespace JMS\Payment\CoreBundle\Plugin\Exception;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
  * This exception will be thrown when the plugin determines the
  * PaymentInstruction to be invalid.
@@ -29,10 +29,10 @@ namespace JMS\Payment\CoreBundle\Plugin\Exception;
  */
 class InvalidPaymentInstructionException extends FinancialException
 {
-    private $dataErrors = array();
-    private $globalErrors = array();
+    private array $dataErrors = [];
+    private array $globalErrors = [];
 
-    public function __construct($message = null, $code = 0, \Exception $previous = null)
+    public function __construct($message = null, $code = 0, Exception $previous = null)
     {
         parent::__construct($message ?: 'The payment instruction is invalid.', $code, $previous);
     }

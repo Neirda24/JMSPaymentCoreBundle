@@ -40,7 +40,7 @@ The next step is to tell Symfony to use your copy of the files instead of the on
             mappings:
                 JMSPaymentCoreBundle:
                     type: xml
-                    dir: '%kernel.root_dir%/config/packages/JMSPaymentCoreBundle'
+                    dir: '%kernel.project_dir%/config/packages/JMSPaymentCoreBundle'
                     prefix: JMS\Payment\CoreBundle\Entity
                     alias: JMSPaymentCoreBundle
 

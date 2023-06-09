@@ -2,13 +2,17 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use JMS\Payment\CoreBundle\Entity\Credit;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 use JMS\Payment\CoreBundle\Entity\FinancialTransaction;
 use JMS\Payment\CoreBundle\Entity\Payment;
 use JMS\Payment\CoreBundle\Entity\PaymentInstruction;
 
-class PaymentInstructionTest extends \PHPUnit_Framework_TestCase
+class PaymentInstructionTest extends TestCase
 {
     public function testConstructor()
     {
@@ -20,9 +24,9 @@ class PaymentInstructionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $instruction->getPaymentSystemName());
         $this->assertSame($data, $instruction->getExtendedData());
         $this->assertSame(FinancialTransaction::STATE_NEW, $instruction->getState());
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $instruction->getCredits());
+        $this->assertInstanceOf(ArrayCollection::class, $instruction->getCredits());
         $this->assertEquals(0, count($instruction->getCredits()));
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $instruction->getPayments());
+        $this->assertInstanceOf(ArrayCollection::class, $instruction->getPayments());
         $this->assertEquals(0, count($instruction->getPayments()));
         $this->assertEquals(0.0, $instruction->getApprovingAmount());
         $this->assertEquals(0.0, $instruction->getApprovedAmount());
@@ -42,20 +46,18 @@ class PaymentInstructionTest extends \PHPUnit_Framework_TestCase
     {
         $instruction = $this->getInstruction();
 
-        $this->assertEquals(0, count($instruction->getCredits()));
+        $this->assertEquals(0, is_countable($instruction->getCredits()) ? count($instruction->getCredits()) : 0);
 
         $credit = new Credit($instruction, 123.12);
 
-        $this->assertEquals(1, count($instruction->getCredits()));
+        $this->assertEquals(1, is_countable($instruction->getCredits()) ? count($instruction->getCredits()) : 0);
         $this->assertSame($credit, $instruction->getCredits()->get(0));
         $this->assertSame($credit->getPaymentInstruction(), $instruction);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddCreditDoesNotAcceptCreditFromAnotherInstruction()
     {
+        $this->expectException(InvalidArgumentException::class);
         $instruction1 = $this->getInstruction();
         $instruction2 = $this->getInstruction();
 
@@ -67,20 +69,18 @@ class PaymentInstructionTest extends \PHPUnit_Framework_TestCase
     {
         $instruction = $this->getInstruction();
 
-        $this->assertEquals(0, count($instruction->getPayments()));
+        $this->assertEquals(0, is_countable($instruction->getPayments()) ? count($instruction->getPayments()) : 0);
 
         $payment = new Payment($instruction, 100);
 
-        $this->assertEquals(1, count($instruction->getPayments()));
+        $this->assertEquals(1, is_countable($instruction->getPayments()) ? count($instruction->getPayments()) : 0);
         $this->assertSame($payment, $instruction->getPayments()->get(0));
         $this->assertSame($payment->getPaymentInstruction(), $instruction);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddPaymentDoesNotAcceptPaymentFromAnotherInstruction()
     {
+        $this->expectException(InvalidArgumentException::class);
         $instruction1 = $this->getInstruction();
         $instruction2 = $this->getInstruction();
 
@@ -91,8 +91,7 @@ class PaymentInstructionTest extends \PHPUnit_Framework_TestCase
     public function testOnPrePersist()
     {
         $instruction = $this->getInstruction();
-        $reflection = new \ReflectionProperty($instruction, 'id');
-        $reflection->setAccessible(true);
+        $reflection = new ReflectionProperty($instruction, 'id');
         $reflection->setValue($instruction, 1234);
 
         $this->assertNull($instruction->getUpdatedAt());
@@ -173,27 +172,7 @@ class PaymentInstructionTest extends \PHPUnit_Framework_TestCase
 
     public function getSetterGetterTestData()
     {
-        return array(
-            array('ApprovingAmount', 123.45, 0.0),
-            array('ApprovingAmount', 583, 0.0),
-            array('ApprovedAmount', 123.45, 0.0),
-            array('ApprovedAmount', 583, 0.0),
-            array('DepositedAmount', 123.45, 0.0),
-            array('DepositedAmount', 583, 0.0),
-            array('DepositingAmount', 123.45, 0.0),
-            array('DepositingAmount', 583, 0.0),
-            array('CreditedAmount', 123.45, 0.0),
-            array('CreditedAmount', 583, 0.0),
-            array('CreditingAmount', 123.45, 0.0),
-            array('CreditingAmount', 583, 0.0),
-            array('ReversingApprovedAmount', 254.32, 0.0),
-            array('ReversingApprovedAmount', 423, 0.0),
-            array('ReversingCreditedAmount', 5632.14, 0.0),
-            array('ReversingCreditedAmount', 2576, 0.0),
-            array('ReversingDepositedAmount', 256.24, 0.0),
-            array('ReversingDepositedAmount', 5365, 0.0),
-            array('State', PaymentInstruction::STATE_INVALID, PaymentInstruction::STATE_NEW),
-        );
+        return [['ApprovingAmount', 123.45, 0.0], ['ApprovingAmount', 583, 0.0], ['ApprovedAmount', 123.45, 0.0], ['ApprovedAmount', 583, 0.0], ['DepositedAmount', 123.45, 0.0], ['DepositedAmount', 583, 0.0], ['DepositingAmount', 123.45, 0.0], ['DepositingAmount', 583, 0.0], ['CreditedAmount', 123.45, 0.0], ['CreditedAmount', 583, 0.0], ['CreditingAmount', 123.45, 0.0], ['CreditingAmount', 583, 0.0], ['ReversingApprovedAmount', 254.32, 0.0], ['ReversingApprovedAmount', 423, 0.0], ['ReversingCreditedAmount', 5632.14, 0.0], ['ReversingCreditedAmount', 2576, 0.0], ['ReversingDepositedAmount', 256.24, 0.0], ['ReversingDepositedAmount', 5365, 0.0], ['State', PaymentInstruction::STATE_INVALID, PaymentInstruction::STATE_NEW]];
     }
 
     public function testChangesToExtendedDataCanBeMadeAfterCreation()

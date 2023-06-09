@@ -2,6 +2,8 @@
 
 namespace JMS\Payment\CoreBundle\Entity;
 
+use DateTime;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 use JMS\Payment\CoreBundle\Model\PaymentInterface;
@@ -26,49 +28,41 @@ class Payment implements PaymentInterface
 {
     private $approvedAmount;
     private $approvingAmount;
-    private $createdAt;
+    private DateTime $createdAt;
     private $creditedAmount;
     private $creditingAmount;
     private $depositedAmount;
     private $depositingAmount;
-    private $expirationDate;
+    private ?DateTime $expirationDate = null;
     private $id;
-
-    /**
-     * @var \JMS\Payment\CoreBundle\Entity\PaymentInstruction
-     */
-    private $paymentInstruction;
 
     private $reversingApprovedAmount;
     private $reversingCreditedAmount;
     private $reversingDepositedAmount;
     private $state;
-    private $targetAmount;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection|\JMS\Payment\CoreBundle\Entity\FinancialTransaction[]
+     * @var ArrayCollection|FinancialTransaction[]
      */
-    private $transactions;
+    private ArrayCollection $transactions;
 
-    private $attentionRequired;
-    private $expired;
-    private $updatedAt;
+    private bool $attentionRequired;
+    private bool $expired;
+    private ?DateTime $updatedAt = null;
 
-    public function __construct(PaymentInstruction $paymentInstruction, $amount)
+    public function __construct(private PaymentInstruction $paymentInstruction, private $targetAmount)
     {
         $this->approvedAmount = 0.0;
         $this->approvingAmount = 0.0;
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTime();
         $this->creditedAmount = 0.0;
         $this->creditingAmount = 0.0;
         $this->depositedAmount = 0.0;
         $this->depositingAmount = 0.0;
-        $this->paymentInstruction = $paymentInstruction;
         $this->reversingApprovedAmount = 0.0;
         $this->reversingCreditedAmount = 0.0;
         $this->reversingDepositedAmount = 0.0;
         $this->state = self::STATE_NEW;
-        $this->targetAmount = $amount;
         $this->transactions = new ArrayCollection();
         $this->attentionRequired = false;
         $this->expired = false;
@@ -88,7 +82,7 @@ class Payment implements PaymentInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\FinancialTransaction|null
+     * @return FinancialTransaction|null
      */
     public function getApproveTransaction()
     {
@@ -130,13 +124,11 @@ class Payment implements PaymentInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|\JMS\Payment\CoreBundle\Entity\FinancialTransaction[]
+     * @return Collection|FinancialTransaction[]
      */
     public function getDepositTransactions()
     {
-        return $this->transactions->filter(function ($transaction) {
-            return FinancialTransactionInterface::TRANSACTION_TYPE_DEPOSIT === $transaction->getTransactionType();
-        });
+        return $this->transactions->filter(fn($transaction) => FinancialTransactionInterface::TRANSACTION_TYPE_DEPOSIT === $transaction->getTransactionType());
     }
 
     public function getExpirationDate()
@@ -150,7 +142,7 @@ class Payment implements PaymentInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\PaymentInstruction
+     * @return PaymentInstruction
      */
     public function getPaymentInstruction()
     {
@@ -158,7 +150,7 @@ class Payment implements PaymentInterface
     }
 
     /**
-     * @return \JMS\Payment\CoreBundle\Entity\FinancialTransaction|null
+     * @return FinancialTransaction|null
      */
     public function getPendingTransaction()
     {
@@ -172,23 +164,19 @@ class Payment implements PaymentInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|\JMS\Payment\CoreBundle\Entity\FinancialTransaction[]
+     * @return Collection|FinancialTransaction[]
      */
     public function getReverseApprovalTransactions()
     {
-        return $this->transactions->filter(function ($transaction) {
-            return FinancialTransactionInterface::TRANSACTION_TYPE_REVERSE_APPROVAL === $transaction->getTransactionType();
-        });
+        return $this->transactions->filter(fn($transaction) => FinancialTransactionInterface::TRANSACTION_TYPE_REVERSE_APPROVAL === $transaction->getTransactionType());
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|\JMS\Payment\CoreBundle\Entity\FinancialTransaction[]
+     * @return Collection|FinancialTransaction[]
      */
     public function getReverseDepositTransactions()
     {
-        return $this->transactions->filter(function ($transaction) {
-            return FinancialTransactionInterface::TRANSACTION_TYPE_REVERSE_DEPOSIT === $transaction->getTransactionType();
-        });
+        return $this->transactions->filter(fn($transaction) => FinancialTransactionInterface::TRANSACTION_TYPE_REVERSE_DEPOSIT === $transaction->getTransactionType());
     }
 
     public function getReversingApprovedAmount()
@@ -217,7 +205,7 @@ class Payment implements PaymentInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection|\JMS\Payment\CoreBundle\Entity\FinancialTransaction[]
+     * @return ArrayCollection|FinancialTransaction[]
      */
     public function getTransactions()
     {
@@ -249,7 +237,7 @@ class Payment implements PaymentInterface
 
     public function onPreSave()
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = new DateTime();
     }
 
     public function setApprovedAmount($amount)
@@ -287,7 +275,7 @@ class Payment implements PaymentInterface
         $this->depositingAmount = $amount;
     }
 
-    public function setExpirationDate(\DateTime $date)
+    public function setExpirationDate(DateTime $date)
     {
         $this->expirationDate = $date;
     }

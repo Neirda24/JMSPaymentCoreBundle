@@ -4,9 +4,9 @@ namespace JMS\Payment\CoreBundle\Tests\Functional;
 
 class PaymentWorkflowNoEncryptionTest extends BasePaymentWorkflowTest
 {
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
-        return parent::createKernel(array('config' => 'config_no_encryption.yml'));
+        return parent::createKernel(['config' => 'config_no_encryption.yml']);
     }
 
     /**

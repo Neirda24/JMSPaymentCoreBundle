@@ -2,9 +2,11 @@
 
 namespace JMS\Payment\CoreBundle\Tests\Plugin;
 
+use PHPUnit\Framework\TestCase;
+use JMS\Payment\CoreBundle\Plugin\GatewayPlugin;
 use JMS\Payment\CoreBundle\BrowserKit\Request;
 
-class GatewayPluginTest extends \PHPUnit_Framework_TestCase
+class GatewayPluginTest extends TestCase
 {
     public function testRequest()
     {
@@ -19,11 +21,11 @@ class GatewayPluginTest extends \PHPUnit_Framework_TestCase
         $response = $plugin->request($request);
 
         $this->assertEquals(file_get_contents(__DIR__.'/Fixtures/sampleResponse'), $response->getContent());
-        $this->assertEquals(200, $response->getStatus());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     protected function getPlugin()
     {
-        return $this->getMockForAbstractClass('JMS\Payment\CoreBundle\Plugin\GatewayPlugin', array(true));
+        return $this->getMockForAbstractClass(GatewayPlugin::class, [true]);
     }
 }

@@ -23,18 +23,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    private $alias;
-
-    public function __construct($alias)
+    public function __construct(private $alias)
     {
-        $this->alias = $alias;
     }
 
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder($this->alias);
 
-        $builder->root($this->alias, 'array')
+        $builder->getRootNode()
             ->children()
                 ->arrayNode('encryption')
                     ->canBeEnabled()
@@ -44,9 +41,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('secret')->cannotBeEmpty()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($config) {
-                            return $config['enabled'] && !array_key_exists('secret', $config);
-                        })
+                        ->ifTrue(fn($config) => $config['enabled'] && !array_key_exists('secret', $config))
                         ->thenInvalid('An encryption secret is required')
                     ->end()
                 ->end()
@@ -56,17 +51,11 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
             ->beforeNormalization()
-                ->ifTrue(function ($config) {
-                    return !empty($config['secret']);
-                })
+                ->ifTrue(fn($config) => !empty($config['secret']))
                 ->then(function ($config) {
                     @trigger_error($this->getSecretDeprecationMessage(), E_USER_DEPRECATED);
 
-                    $config['encryption'] = array(
-                        'enabled'  => true,
-                        'provider' => 'mcrypt',
-                        'secret'   => $config['secret'],
-                    );
+                    $config['encryption'] = ['enabled'  => true, 'provider' => 'mcrypt', 'secret'   => $config['secret']];
 
                     return $config;
                 })

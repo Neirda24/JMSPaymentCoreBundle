@@ -20,10 +20,10 @@ namespace JMS\Payment\CoreBundle\Model;
 
 interface PaymentInstructionInterface
 {
-    const STATE_CLOSED = 1;
-    const STATE_INVALID = 2;
-    const STATE_NEW = 3;
-    const STATE_VALID = 4;
+    public const STATE_CLOSED = 1;
+    public const STATE_INVALID = 2;
+    public const STATE_NEW = 3;
+    public const STATE_VALID = 4;
 
     public function getAmount();
     public function getApprovedAmount();
@@ -32,7 +32,7 @@ interface PaymentInstructionInterface
     public function getCreditingAmount();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\CreditInterface[]
+     * @return CreditInterface[]
      */
     public function getCredits();
 
@@ -41,21 +41,21 @@ interface PaymentInstructionInterface
     public function getDepositingAmount();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\ExtendedDataInterface
+     * @return ExtendedDataInterface
      */
     public function getExtendedData();
 
     public function getId();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\PaymentInterface[]
+     * @return PaymentInterface[]
      */
     public function getPayments();
 
     public function getPaymentSystemName();
 
     /**
-     * @return \JMS\Payment\CoreBundle\Model\FinancialTransactionInterface|null
+     * @return FinancialTransactionInterface|null
      */
     public function getPendingTransaction();
 

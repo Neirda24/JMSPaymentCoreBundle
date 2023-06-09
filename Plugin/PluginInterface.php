@@ -2,6 +2,7 @@
 
 namespace JMS\Payment\CoreBundle\Plugin;
 
+use JMS\Payment\CoreBundle\Plugin\Exception\InvalidPaymentInstructionException;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
 
@@ -31,13 +32,13 @@ use JMS\Payment\CoreBundle\Model\PaymentInstructionInterface;
  */
 interface PluginInterface
 {
-    const RESPONSE_CODE_PENDING = 'pending';
-    const RESPONSE_CODE_SUCCESS = 'success';
-    const REASON_CODE_ACTION_REQUIRED = 'action_required';
-    const REASON_CODE_BLOCKED = 'blocked';
-    const REASON_CODE_INVALID = 'invalid';
-    const REASON_CODE_SUCCESS = 'none';
-    const REASON_CODE_TIMEOUT = 'timeout';
+    public const RESPONSE_CODE_PENDING = 'pending';
+    public const RESPONSE_CODE_SUCCESS = 'success';
+    public const REASON_CODE_ACTION_REQUIRED = 'action_required';
+    public const REASON_CODE_BLOCKED = 'blocked';
+    public const REASON_CODE_INVALID = 'invalid';
+    public const REASON_CODE_SUCCESS = 'none';
+    public const REASON_CODE_TIMEOUT = 'timeout';
 
     /**
      * This method executes an approve transaction.
@@ -80,7 +81,7 @@ interface PluginInterface
      *
      * @param PaymentInstructionInterface $paymentInstruction
      *
-     * @throws JMS\Payment\CoreBundle\Plugin\Exception\InvalidPaymentInstructionException if the the PaymentInstruction is not valid
+     * @throws InvalidPaymentInstructionException if the the PaymentInstruction is not valid
      */
     public function checkPaymentInstruction(PaymentInstructionInterface $paymentInstruction);
 
@@ -150,7 +151,7 @@ interface PluginInterface
      * in that it may actually connect to the payment backend system; no funds should
      * be transferred, though.
      *
-     * @throws JMS\Payment\CoreBundle\Plugin\Exception\InvalidPaymentInstructionException if the PaymentInstruction is not valid
+     * @throws InvalidPaymentInstructionException if the PaymentInstruction is not valid
      *
      * @param PaymentInstructionInterface $paymentInstruction
      */

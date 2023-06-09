@@ -6,11 +6,14 @@ use JMS\Payment\CoreBundle\Command\GenerateKeyCommand;
 use JMS\Payment\CoreBundle\Cryptography\DefusePhpEncryptionService;
 use JMS\Payment\CoreBundle\Tests\Functional\BaseTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class GenerateKeyCommandTest extends BaseTestCase
 {
-    public function setUp()
+    private Command $command;
+
+    public function setUp(): void
     {
         self::createKernel();
 
@@ -27,7 +30,7 @@ class GenerateKeyCommandTest extends BaseTestCase
      */
     public function testGeneration()
     {
-        $key = trim($this->execute(array()));
+        $key = trim((string) $this->execute([]));
 
         $cipher = new DefusePhpEncryptionService($key);
 
@@ -39,9 +42,7 @@ class GenerateKeyCommandTest extends BaseTestCase
     {
         $commandTester = new CommandTester($this->command);
 
-        $commandTester->execute(array_merge(array(
-            'command' => $this->command->getName(),
-        ), $input));
+        $commandTester->execute(array_merge(['command' => $this->command->getName()], $input));
 
         return $commandTester->getDisplay();
     }
