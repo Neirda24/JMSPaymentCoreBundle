@@ -22,7 +22,7 @@
     "require": {
         "php": ">=8.2",
         "doctrine/common": "^3.0",
-        "doctrine/dbal": "^2.13",
+        "doctrine/dbal": "^3.6.0",
         "doctrine/orm": "^2.8",
         "symfony/browser-kit": "^5.4",
         "symfony/config": "^5.4",
@@ -57,9 +57,5 @@
     },
     "autoload": {
         "psr-4": { "JMS\\Payment\\CoreBundle\\": "" }
-    },
-    "autoload-dev": {
-        "psr-4": { "JMS\\Payment\\CoreBundle\\Tests\\": "Tests" }
-    },
-    "target-dir": "JMS/Payment/CoreBundle"
+    }
 }
