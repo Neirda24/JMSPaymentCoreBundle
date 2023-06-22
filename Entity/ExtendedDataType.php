@@ -31,17 +31,17 @@ class ExtendedDataType extends ObjectType
 
     private static ?EncryptionServiceInterface $encryptionService = null;
 
-    public static function setEncryptionService(EncryptionServiceInterface $service)
+    public static function setEncryptionService(EncryptionServiceInterface $service): void
     {
         self::$encryptionService = $service;
     }
 
-    public static function getEncryptionService()
+    public static function getEncryptionService(): ?EncryptionServiceInterface
     {
         return self::$encryptionService;
     }
 
-    public function convertToDatabaseValue($extendedData, AbstractPlatform $platform)
+    public function convertToDatabaseValue($extendedData, AbstractPlatform $platform): ?string
     {
         if ($extendedData === null) {
             return null;
@@ -73,7 +73,7 @@ class ExtendedDataType extends ObjectType
         return parent::convertToDatabaseValue($data, $platform);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?ExtendedData
     {
         $data = parent::convertToPHPValue($value, $platform);
 
@@ -101,12 +101,12 @@ class ExtendedDataType extends ObjectType
         return $extendedData;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
 
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    public function requiresSQLCommentHint(AbstractPlatform $platform): true
     {
         return true;
     }

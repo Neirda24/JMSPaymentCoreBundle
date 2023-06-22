@@ -58,18 +58,18 @@ class Credit implements CreditInterface
         $this->paymentInstruction->addCredit($this);
     }
 
-    public function addTransaction(FinancialTransaction $transaction)
+    public function addTransaction(FinancialTransaction $transaction): void
     {
         $this->transactions->add($transaction);
         $transaction->setCredit($this);
     }
 
-    public function getCreditedAmount()
+    public function getCreditedAmount(): float
     {
         return $this->creditedAmount;
     }
 
-    public function getCreditingAmount()
+    public function getCreditingAmount(): float
     {
         return $this->creditingAmount;
     }
@@ -77,7 +77,7 @@ class Credit implements CreditInterface
     /**
      * @return FinancialTransaction|null
      */
-    public function getCreditTransaction()
+    public function getCreditTransaction(): ?FinancialTransaction
     {
         foreach ($this->transactions as $transaction) {
             if (FinancialTransactionInterface::TRANSACTION_TYPE_CREDIT === $transaction->getTransactionType()) {
@@ -112,7 +112,7 @@ class Credit implements CreditInterface
     /**
      * @return FinancialTransaction|null
      */
-    public function getPendingTransaction()
+    public function getPendingTransaction(): ?FinancialTransaction
     {
         foreach ($this->transactions as $transaction) {
             if (FinancialTransactionInterface::STATE_PENDING === $transaction->getState()) {
@@ -126,17 +126,17 @@ class Credit implements CreditInterface
     /**
      * @return Collection<FinancialTransaction>
      */
-    public function getReverseCreditTransactions()
+    public function getReverseCreditTransactions(): Collection
     {
         return $this->transactions->filter(fn($transaction) => FinancialTransactionInterface::TRANSACTION_TYPE_REVERSE_CREDIT === $transaction->getTransactionType());
     }
 
-    public function getReversingAmount()
+    public function getReversingAmount(): float
     {
         return $this->reversingAmount;
     }
 
-    public function getState()
+    public function getState(): int
     {
         return $this->state;
     }
@@ -149,57 +149,57 @@ class Credit implements CreditInterface
     /**
      * @return ArrayCollection
      */
-    public function getTransactions()
+    public function getTransactions(): Collection
     {
         return $this->transactions;
     }
 
-    public function isAttentionRequired()
+    public function isAttentionRequired(): bool
     {
         return $this->attentionRequired;
     }
 
-    public function isIndependent()
+    public function isIndependent(): bool
     {
         return null === $this->payment;
     }
 
-    public function setAttentionRequired($boolean)
+    public function setAttentionRequired($boolean): void
     {
         $this->attentionRequired = (bool) $boolean;
     }
 
-    public function setPayment(PaymentInterface $payment)
+    public function setPayment(PaymentInterface $payment): void
     {
         $this->payment = $payment;
     }
 
-    public function hasPendingTransaction()
+    public function hasPendingTransaction(): bool
     {
         return null !== $this->getPendingTransaction();
     }
 
-    public function setCreditedAmount($amount)
+    public function setCreditedAmount($amount): void
     {
         $this->creditedAmount = $amount;
     }
 
-    public function setCreditingAmount($amount)
+    public function setCreditingAmount($amount): void
     {
         $this->creditingAmount = $amount;
     }
 
-    public function setReversingAmount($amount)
+    public function setReversingAmount($amount): void
     {
         $this->reversingAmount = $amount;
     }
 
-    public function setState($state)
+    public function setState($state): void
     {
         $this->state = $state;
     }
 
-    public function onPreSave()
+    public function onPreSave(): void
     {
         $this->updatedAt = new DateTime();
     }

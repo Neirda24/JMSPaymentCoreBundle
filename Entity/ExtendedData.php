@@ -31,7 +31,7 @@ class ExtendedData implements ExtendedDataInterface
         $this->data = [];
     }
 
-    public function remove($name)
+    public function remove($name): void
     {
         unset($this->data[$name]);
     }
@@ -54,7 +54,7 @@ class ExtendedData implements ExtendedDataInterface
         return $this->data[$name][2];
     }
 
-    public function set($name, $value, $encrypt = true, $persist = true)
+    public function set($name, $value, $encrypt = true, $persist = true): void
     {
         if ($encrypt && !$persist) {
             throw new InvalidArgumentException(sprintf('Non persisted field cannot be encrypted "%s".', $name));
@@ -72,7 +72,7 @@ class ExtendedData implements ExtendedDataInterface
         return $this->data[$name][0];
     }
 
-    public function has($name)
+    public function has($name): bool
     {
         return isset($this->data[$name]);
     }
@@ -82,7 +82,7 @@ class ExtendedData implements ExtendedDataInterface
         return $this->data;
     }
 
-    public function equals(ExtendedDataInterface $data)
+    public function equals(ExtendedDataInterface $data): bool
     {
         $data = $data->all();
         ksort($data);

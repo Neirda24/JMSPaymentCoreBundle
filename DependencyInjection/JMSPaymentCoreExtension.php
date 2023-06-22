@@ -28,12 +28,12 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class JMSPaymentCoreExtension extends Extension implements PrependExtensionInterface
 {
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $container->prependExtensionConfig('doctrine', ['dbal' => ['types' => [ExtendedDataType::NAME => ExtendedDataType::class]]]);
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $xmlLoader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $xmlLoader->load('payment.xml');
@@ -64,7 +64,7 @@ class JMSPaymentCoreExtension extends Extension implements PrependExtensionInter
         }
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): Configuration
     {
         return new Configuration($this->getAlias());
     }

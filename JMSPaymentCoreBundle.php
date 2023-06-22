@@ -28,14 +28,14 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class JMSPaymentCoreBundle extends Bundle
 {
-    public function boot()
+    public function boot(): void
     {
         if ($this->container->has('payment.encryption')) {
             ExtendedDataType::setEncryptionService($this->container->get('payment.encryption'));
         }
     }
 
-    public function build(ContainerBuilder $builder)
+    public function build(ContainerBuilder $builder): void
     {
         parent::build($builder);
 

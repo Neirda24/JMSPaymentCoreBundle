@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
     {
     }
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder($this->alias);
 
@@ -65,7 +65,7 @@ class Configuration implements ConfigurationInterface
         return $builder;
     }
 
-    private function getSecretDeprecationMessage()
+    private function getSecretDeprecationMessage(): string
     {
         return "The 'secret' configuration option has been deprecated in favor of 'encryption.secret' and will be removed in 2.0. Please note that if you start using 'encryption.secret' you also need to set 'encryption.provider' to 'mcrypt' since mcrypt is not the default when using the 'encryption.*' options.";
     }

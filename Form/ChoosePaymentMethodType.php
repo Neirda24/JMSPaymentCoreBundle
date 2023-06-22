@@ -41,7 +41,7 @@ class ChoosePaymentMethodType extends AbstractType
         $this->transformer = $transformer;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options['available_methods'] = $this->getPaymentMethods($options['allowed_methods']);
 
@@ -130,7 +130,7 @@ class ChoosePaymentMethodType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['amount', 'currency']);
 
@@ -147,7 +147,7 @@ class ChoosePaymentMethodType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'jms_choose_payment_method';
     }
