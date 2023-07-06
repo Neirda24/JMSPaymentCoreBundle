@@ -42,9 +42,9 @@ class Payment implements PaymentInterface
     private $state;
 
     /**
-     * @var ArrayCollection|FinancialTransaction[]
+     * @var Collection|FinancialTransaction[]
      */
-    private ArrayCollection $transactions;
+    private Collection $transactions;
 
     private bool $attentionRequired;
     private bool $expired;
